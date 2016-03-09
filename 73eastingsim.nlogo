@@ -307,20 +307,20 @@ to detect
 to m1a1engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
-  let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
+  ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
   if crest = 1
   [
-    let m1a1targets t72s in-radius m1a1max_engagement_range ;;find any T-72s in our max engagement range iff we're over the ridge line
-    let target min-one-of m1a1targets [distance myself] ;; engage the closest T72
+    ;;let m1a1targets t72s in-radius m1a1max_engagement_range ;;find any T-72s in our max engagement range iff we're over the ridge line
+    ;;let target min-one-of m1a1targets [distance myself] ;; engage the closest T72
     let shoot false
-    if target != nobody [ set shoot true ] ;;if there's somebody in range
+    if t72target != nobody [ set shoot true ] ;;if there's somebody in range
     if shoot = true
     [
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
-        create-link-to target [set color blue] ;;show what units the M1A1s are engaging
-        ask target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
-        let targetrange [distance myself] of target / scale_factor_x
+        create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
+        ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
+        let targetrange [distance myself] of t72target / scale_factor_x
         ;show targetrange ;;print the target range (for debug)
         let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
         set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
@@ -329,7 +329,7 @@ to m1a1engage
         ;show m1a1_shot ;; print the randomly distributed uniform [0,1].
         ifelse m1a1_shot <= m1a1hitrate ;;check this random number against our hit probability...
           [
-            ask target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability
+            ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
           [
