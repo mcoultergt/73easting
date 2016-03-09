@@ -330,13 +330,13 @@ to m1a1engage
         ;show m1a1_shot ;; print the randomly distributed uniform [0,1].
         ifelse m1a1_shot <= m1a1hitrate ;;check this random number against our hit probability...
           [
-            if m1a1-ammo-type = "sabot"
+            if m1a1-ammo-type = "sabot" ;; this is our damage model for our sabot round
             [
             ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
-            if m1a1-ammo-type = "heat"
+            if m1a1-ammo-type = "heat" ;;this is our damage model for our heat round
             [
-            ask t72target [set hp hp - 0.5 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
+            ask t72target [set hp hp - 0.5 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
@@ -1061,7 +1061,7 @@ CHOOSER
 m1a1-ammo-type
 m1a1-ammo-type
 "heat" "sabot"
-0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
