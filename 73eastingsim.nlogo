@@ -338,8 +338,6 @@ to m1a1engage
             [
             ask t72target [set hp hp - 0.5 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
-
-
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
           [
@@ -1056,14 +1054,14 @@ NIL
 1
 
 CHOOSER
-223
-273
-361
-318
+199
+568
+291
+613
 m1a1-ammo-type
 m1a1-ammo-type
 "heat" "sabot"
-1
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
