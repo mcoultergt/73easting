@@ -363,7 +363,7 @@ to t72engage
   ;;let targetrange distance target * scale_factor_x
   if (shoot = true)
   [
-   if [crest] of target = 1
+   if [crest] of target = 1 ;; if the target is over the ridge
    [
     if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
     [
