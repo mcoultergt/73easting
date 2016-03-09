@@ -33,6 +33,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
+  set m1a1-ammo-type "sabot"
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -1044,6 +1045,16 @@ NIL
 NIL
 NIL
 1
+
+CHOOSER
+223
+273
+361
+318
+m1a1-ammo-type
+m1a1-ammo-type
+"heat" "sabot"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
