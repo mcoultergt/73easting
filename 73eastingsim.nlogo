@@ -46,13 +46,13 @@ to reset
   set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
   set M1A1_GPS true
-  set m1a1-formation "|"
+  set m1a1-formation "Line"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
   set T72_Thermal_Sights_Range 1300
   set T72_Turret_Stablization false
   set T72_GPS false
-  set t72-formation "|"
+  set t72-formation "Line"
   set t72-spacing 10
   set Desert_Length_In_Meters 10000
   set Desert_Height_In_Meters 10000
@@ -165,7 +165,8 @@ to setup-t72s
   create-ordered-t72s 17 ;; we're going to make our circle of T72s using the same parameters as the other T72s
       [
       setxy coil_middle_t72_x_cor coil_middle_t72_y_cor
-      fd 10
+      ifelse max-pxcor - coil_middle_t72_x_cor < 10
+      [fd max-pxcor - coil_middle_t72_x_cor][fd 10]
       set color red
       set size 5
       set hp 1
@@ -937,7 +938,7 @@ CHOOSER
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
-1
+0
 
 SLIDER
 15
@@ -972,7 +973,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-1
+0
 1
 -1000
 
