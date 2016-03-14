@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target ]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105mm]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -179,12 +179,15 @@ to setup-technology
      ifelse M1A1_Turret_Stablization = True
        [set M1A1turret_stab 1]
        [set M1A1turret_stab 0]
-      ;ifelse M1A1_Thermal_Sights = True
-       ;[set M1A1thermal_sights 1 set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-       ;[set M1A1thermal_sights 0 set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
+      ifelse M1A1_Thermal_Sights = True
+       [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
+       [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
       ifelse M1A1_GPS = True
        [set M1A1gps 1]
        [set M1A1gps 0]
+      ifelse m1a1-fcs
+       [set M1A1_fcs 1]
+       [set M1A1_fcs 0]
      ; ifelse T72_Turret_Stablization = True
      ;  [set T72turret_stab 1]
      ;  [set T72turret_stab 0]
@@ -292,17 +295,13 @@ to detect
        ;;need to fix this before final commit!
        ;write "tau ="
        ;show tau
-       ifelse  M1A1_Thermal_Sights
+       ifelse M1A1thermal_sights = 1
        [ set p_detection 0.99 ]
        [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
-       set p_detection 1 - exp (-30 / tau)
-       ;write "probability of detection"
-       ;show p_detection
        set random_detect random 1
        if random_detect <= p_detection
        [
-
-        set t72target self
+         set t72target self
         ;show t72target
        ]
      ]
@@ -327,7 +326,7 @@ to m1a1engage
         ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         let targetrange [distance myself] of t72target / scale_factor_x
         ;show targetrange ;;print the target range (for debug)
-        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (m1a1-fcs * 235.2)) - (3.31 + (-0.438 * m1a1-fcs))))))
+        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (M1A1_fcs * 235.2)) - (3.31 + (-0.438 * M1A1_fcs))))))
 
 
         ;; this is old code
@@ -349,6 +348,7 @@ to m1a1engage
             [
               ;;now that we've hit let's compute probability of kill
               let p_k_105 (0.75 - .00068 * targetrange)
+
               ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
@@ -434,10 +434,10 @@ end
 GRAPHICS-WINDOW
 601
 10
-2221
-1651
-80
-80
+1221
+651
+30
+30
 10.0
 1
 14
@@ -448,10 +448,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--80
-80
--80
-80
+-30
+30
+-30
+30
 0
 0
 1
@@ -571,7 +571,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-20
+16
 1
 1
 NIL
@@ -922,7 +922,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-0
+1
 1
 -1000
 
@@ -935,7 +935,7 @@ extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-22
+14
 1
 1
 NIL
@@ -1011,7 +1011,7 @@ CHOOSER
 m1a1-main-gun
 m1a1-main-gun
 "105mm" "120mm"
-0
+1
 
 SWITCH
 17
@@ -1034,6 +1034,17 @@ m1a1-fcs
 0
 1
 -1000
+
+MONITOR
+362
+96
+441
+141
+NIL
+p_k_105mm
+6
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
