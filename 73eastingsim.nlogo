@@ -43,7 +43,7 @@ to reset
   set coil_middle_t72_x_cor 35
   set coil_middle_t72_y_cor 10
   set M1A1_Thermal_Sights true
-  set M1A1_Thermal_Sights_Range 2000
+  ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
   set M1A1_GPS true
   set m1a1-formation "|"
@@ -179,9 +179,9 @@ to setup-technology
      ifelse M1A1_Turret_Stablization = True
        [set M1A1turret_stab 1]
        [set M1A1turret_stab 0]
-      ifelse M1A1_Thermal_Sights = True
-       [set M1A1thermal_sights 1 set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-       [set M1A1thermal_sights 0 set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
+      ;ifelse M1A1_Thermal_Sights = True
+       ;[set M1A1thermal_sights 1 set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
+       ;[set M1A1thermal_sights 0 set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
       ifelse M1A1_GPS = True
        [set M1A1gps 1]
        [set M1A1gps 0]
@@ -323,7 +323,7 @@ to m1a1engage
         ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         let targetrange [distance myself] of t72target / scale_factor_x
         ;show targetrange ;;print the target range (for debug)
-        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (m1a1-fcs * 235.2)) - (3.31 + (-0.438 * m1a1-fcs)
+        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (m1a1-fcs * 235.2)) - (3.31 + (-0.438 * m1a1-fcs))))))
 
 
         ;; this is old code
@@ -653,21 +653,6 @@ scale_factor_x
 17
 1
 11
-
-SLIDER
-19
-615
-282
-648
-M1A1_Thermal_Sights_Range
-M1A1_Thermal_Sights_Range
-0
-2000
-2000
-1
-1
-meters
-HORIZONTAL
 
 TEXTBOX
 278
