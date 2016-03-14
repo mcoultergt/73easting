@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -188,6 +188,10 @@ to setup-technology
       ifelse m1a1-fcs
        [set M1A1_fcs 1]
        [set M1A1_fcs 0]
+
+       ifelse m1a1-upgraded-armor = True
+       [set m1a1_armor 1]
+       [set m1a1_armor 0]
      ; ifelse T72_Turret_Stablization = True
      ;  [set T72turret_stab 1]
      ;  [set T72turret_stab 0]
@@ -359,7 +363,7 @@ to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
-  let t72max_engagement_range t72thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage
+  let t72max_engagement_range t72thermal_sights_range / scale_factor_x ;; set the farthest away patch the M1A1s can engage
   let t72targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
   if t72targets != nobody
   [
@@ -383,8 +387,15 @@ to t72engage
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
           [
-            ;;since we've hit let's do a p_k_t72
+            ;; since we've hit let's see if armor is on
+            ifelse m1a1_armor = 0
+            [let p_k_t72 (0.99 - 0.00018 * targetrangem1a1)]
+            [let p_k_t72 (0.89 - 0.00028 * targetrangem1a1)]
+            let t72_shot_kill random-float 1 ;;have a randomly distributed uniform [0,1].
+            if t72_shot_kill <= p_k_t72
+            [
             ask target [set hp hp - 1]
+            ]
           ]
       set fired 3 ;;reset our fired for t72s.
     ]
@@ -538,7 +549,7 @@ lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--20
+-4
 1
 1
 NIL
@@ -568,7 +579,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-16
+10
 1
 1
 NIL
@@ -895,7 +906,7 @@ desert-visibility
 desert-visibility
 0
 20000
-50
+6590
 1
 1
 meters
@@ -1050,7 +1061,7 @@ SWITCH
 647
 m1a1-upgraded-armor
 m1a1-upgraded-armor
-1
+0
 1
 -1000
 
