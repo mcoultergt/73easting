@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105mm]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -324,15 +324,8 @@ to m1a1engage
       [
         create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
         ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
-        let targetrange [distance myself] of t72target / scale_factor_x
-        ;show targetrange ;;print the target range (for debug)
+        let targetrange [distance myself] of t72target * scale_factor_x
         set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (M1A1_fcs * 235.2)) - (3.31 + (-0.438 * M1A1_fcs))))))
-
-
-        ;; this is old code
-        ;let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
-        ;set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
-        ;show m1a1hitrate ;; print the hit rate (for debug)
 
 
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
@@ -347,8 +340,7 @@ to m1a1engage
             if m1a1-main-gun = "105mm" ;;this is our damage model for our heat round
             [
               ;;now that we've hit let's compute probability of kill
-              let p_k_105 (0.75 - .00068 * targetrange)
-
+              set p_k_105 (0.75 - .00068 * targetrange)
               ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
@@ -369,31 +361,35 @@ to t72engage
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
   let t72max_engagement_range t72thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage
   let t72targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
-  let target min-one-of t72targets [distance myself] ;; engage the closest M1A1
-  ;if target xcor >= ridgeline_x_cor
-  let shoot false ;;reset the check
-  if target != nobody [ set shoot true ] ;;if there's somebody in range
-  ;;let targetrange distance target * scale_factor_x
-  if (shoot = true)
+  if t72targets != nobody
   [
-   if [crest] of target = 1 ;; if the target is over the ridge
-   [
-    if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
+    let target min-one-of t72targets [distance myself] ;; engage the closest M1A1
+      if target != nobody
+      [
+    let targetrangem1a1 [distance myself] of target / scale_factor_x
+
+    ;if target xcor >= ridgeline_x_cor
+    let shoot false ;;reset the check
+    if target != nobody [ set shoot true ] ;;if there's somebody in range
+    ;;let targetrange distance target * scale_factor_x
+    if (shoot = true)
     [
-      create-link-to target [set color red] ;;create a red link to M1A1s
-      let targetrange [distance myself] of target / scale_factor_x ;; set the range based on patches
-      ;show targetrange ;; print the target range
-      let cep (t72hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular
-      set t72hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our T72hitrate
-      ;show t72hitrate ;;debug print
-      set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
-      if t72_shot <= t72hitrate ;;check this random number against our hit probability...
+      if [crest] of target = 1 ;; if the target is over the ridge
+      [
+        if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
+        [
+          create-link-to target [set color red] ;;create a red link to M1A1s
+          set t72hitrate (1 / ( 1 + exp ( (targetrangem1a1 / 643.5) - 2.97)))
+          set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
+          if t72_shot <= t72hitrate ;;check this random number against our hit probability...
           [
             ask target [set hp hp - 1]
           ]
       set fired 3 ;;reset our fired for t72s.
     ]
     ]
+  ]
+  ]
   ]
 end
 
@@ -1011,7 +1007,7 @@ CHOOSER
 m1a1-main-gun
 m1a1-main-gun
 "105mm" "120mm"
-1
+0
 
 SWITCH
 17
@@ -1020,7 +1016,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-1
+0
 1
 -1000
 
@@ -1041,7 +1037,7 @@ MONITOR
 441
 141
 NIL
-p_k_105mm
+p_k_105
 6
 1
 11
