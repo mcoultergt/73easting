@@ -323,9 +323,15 @@ to m1a1engage
         ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         let targetrange [distance myself] of t72target / scale_factor_x
         ;show targetrange ;;print the target range (for debug)
-        let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
-        set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
+        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (m1a1-fcs * 235.2)) - (3.31 + (-0.438 * m1a1-fcs)
+
+
+        ;; this is old code
+        ;let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
+        ;set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
         ;show m1a1hitrate ;; print the hit rate (for debug)
+
+
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
         ;show m1a1_shot ;; print the randomly distributed uniform [0,1].
         ifelse m1a1_shot <= m1a1hitrate ;;check this random number against our hit probability...
@@ -1026,6 +1032,17 @@ SWITCH
 T72_Thermal_Sights
 T72_Thermal_Sights
 1
+1
+-1000
+
+SWITCH
+194
+736
+300
+769
+m1a1-fcs
+m1a1-fcs
+0
 1
 -1000
 
