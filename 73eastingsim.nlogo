@@ -33,7 +33,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  set m1a1-ammo-type "sabot"
+  set m1a1-main-gun "120mm"
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -49,9 +49,9 @@ to reset
   set m1a1-formation "|"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
-  set T72_Thermal_Sights_Range 1300
-  set T72_Turret_Stablization false
-  set T72_GPS false
+  ;set T72_Thermal_Sights_Range 1300
+  ;set T72_Turret_Stablization false
+  ;set T72_GPS false
   set t72-formation "|"
   set t72-spacing 10
   set Desert_Length_In_Meters 10000
@@ -185,15 +185,15 @@ to setup-technology
       ifelse M1A1_GPS = True
        [set M1A1gps 1]
        [set M1A1gps 0]
-      ifelse T72_Turret_Stablization = True
-       [set T72turret_stab 1]
-       [set T72turret_stab 0]
+     ; ifelse T72_Turret_Stablization = True
+     ;  [set T72turret_stab 1]
+     ;  [set T72turret_stab 0]
       ifelse T72_Thermal_Sights = True
-       [set T72thermal_sights 1 set T72thermal_sights_range T72_Thermal_Sights_Range] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
+       [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
        [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
-      ifelse T72_GPS = True
-       [set T72gps 1]
-       [set T72gps 0]
+     ; ifelse T72_GPS = True
+     ;  [set T72gps 1]
+     ; [set T72gps 0]
   ;;second iteration hit rate
   set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
   set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
@@ -330,13 +330,16 @@ to m1a1engage
         ;show m1a1_shot ;; print the randomly distributed uniform [0,1].
         ifelse m1a1_shot <= m1a1hitrate ;;check this random number against our hit probability...
           [
-            if m1a1-ammo-type = "sabot" ;; this is our damage model for our sabot round
+            if m1a1-main-gun = "120mm" ;; this is our damage model for our sabot round
             [
-            ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
+             ;;now that we've hit let's compute probability of kill
+              ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
-            if m1a1-ammo-type = "heat" ;;this is our damage model for our heat round
+            if m1a1-main-gun = "105mm" ;;this is our damage model for our heat round
             [
-            ask t72target [set hp hp - 0.5 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
+              ;;now that we've hit let's compute probability of kill
+              let p_k_105 (0.75 - .00068 * targetrange)
+              ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
@@ -612,39 +615,6 @@ M1A1_GPS
 1
 -1000
 
-SWITCH
-14
-794
-181
-827
-T72_Thermal_Sights
-T72_Thermal_Sights
-1
-1
--1000
-
-SWITCH
-15
-867
-210
-900
-T72_Turret_Stablization
-T72_Turret_Stablization
-1
-1
--1000
-
-SWITCH
-16
-904
-121
-937
-T72_GPS
-T72_GPS
-1
-1
--1000
-
 MONITOR
 277
 93
@@ -702,21 +672,6 @@ Computed Values from Simulation
 11
 0.0
 1
-
-SLIDER
-16
-830
-268
-863
-T72_Thermal_Sights_Range
-T72_Thermal_Sights_Range
-50
-2000
-1300
-1
-1
-meters
-HORIZONTAL
 
 SLIDER
 16
@@ -1058,10 +1013,21 @@ CHOOSER
 568
 291
 613
-m1a1-ammo-type
-m1a1-ammo-type
-"heat" "sabot"
+m1a1-main-gun
+m1a1-main-gun
+"105mm" "120mm"
+0
+
+SWITCH
+17
+792
+184
+825
+T72_Thermal_Sights
+T72_Thermal_Sights
 1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
