@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target ]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105mm]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -33,7 +33,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  set m1a1-ammo-type "sabot"
+  set m1a1-main-gun "120mm"
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -43,16 +43,23 @@ to reset
   set coil_middle_t72_x_cor 35
   set coil_middle_t72_y_cor 10
   set M1A1_Thermal_Sights true
-  set M1A1_Thermal_Sights_Range 2000
+  ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
   set M1A1_GPS true
-  set m1a1-formation "|"
+  set m1a1-formation "Line"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
+<<<<<<< HEAD
   set T72_Thermal_Sights_Range 1300
   set T72_Turret_Stablization false
   set T72_GPS false
+  set t72-formation "Line"
+=======
+  ;set T72_Thermal_Sights_Range 1300
+  ;set T72_Turret_Stablization false
+  ;set T72_GPS false
   set t72-formation "|"
+>>>>>>> origin/dev
   set t72-spacing 10
   set Desert_Length_In_Meters 10000
   set Desert_Height_In_Meters 10000
@@ -180,20 +187,23 @@ to setup-technology
        [set M1A1turret_stab 1]
        [set M1A1turret_stab 0]
       ifelse M1A1_Thermal_Sights = True
-       [set M1A1thermal_sights 1 set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-       [set M1A1thermal_sights 0 set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
+       [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
+       [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
       ifelse M1A1_GPS = True
        [set M1A1gps 1]
        [set M1A1gps 0]
-      ifelse T72_Turret_Stablization = True
-       [set T72turret_stab 1]
-       [set T72turret_stab 0]
+      ifelse m1a1-fcs
+       [set M1A1_fcs 1]
+       [set M1A1_fcs 0]
+     ; ifelse T72_Turret_Stablization = True
+     ;  [set T72turret_stab 1]
+     ;  [set T72turret_stab 0]
       ifelse T72_Thermal_Sights = True
-       [set T72thermal_sights 1 set T72thermal_sights_range T72_Thermal_Sights_Range] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
+       [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
        [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
-      ifelse T72_GPS = True
-       [set T72gps 1]
-       [set T72gps 0]
+     ; ifelse T72_GPS = True
+     ;  [set T72gps 1]
+     ; [set T72gps 0]
   ;;second iteration hit rate
   set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
   set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
@@ -256,6 +266,8 @@ to move
    [
    set crest 1 ;; set our crest variable if they've gone over the hill
    ]
+   if coil-t72s = true and  pxcor = coil_middle_t72_x_cor - 10
+   [lt 5 fd m1a1_move_speed]
    end
 
 ;;TODO - Comment this code!
@@ -282,23 +294,23 @@ to detect
    ;;write "target direction" ;;removed this line as it was slowing down the simulation... too much information!
    ;;show target_direction ;;removed this line as it was slowing down the simulation... too much information!
      if direction_of_view - 9 < target_direction and direction_of_view + 9 > target_direction
-     [ ;write "range"
-       ;show distance turtle 1 / scale_factor_x / 1000
+     [
+       let range (distance myself) / scale_factor_x
        ;; TODO
        ;;add in carefully here to suppress error where there's nothing to aim at...
-       carefully
-       [set tau 6.8 * 8 * distance turtle 1 / 14.85 / 2.93 / 1000 / scale_factor_x]
-       [set tau 1] ;;set tau to one to prevent divide by zero errors.
+       ;carefully
+       ;[set tau 6.8 * 8 * distance turtle 1 / 14.85 / 2.93 / 1000 / scale_factor_x]
+       ;[set tau 1] ;;set tau to one to prevent divide by zero errors.
        ;;need to fix this before final commit!
        ;write "tau ="
        ;show tau
-       set p_detection 1 - exp (-30 / tau)
-       ;write "probability of detection"
-       ;show p_detection
+       ifelse M1A1thermal_sights = 1
+       [ set p_detection 0.99 ]
+       [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
        set random_detect random 1
        if random_detect <= p_detection
        [
-        set t72target self
+         set t72target self
         ;show t72target
        ]
      ]
@@ -323,20 +335,30 @@ to m1a1engage
         ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         let targetrange [distance myself] of t72target / scale_factor_x
         ;show targetrange ;;print the target range (for debug)
-        let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
-        set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
+        set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (M1A1_fcs * 235.2)) - (3.31 + (-0.438 * M1A1_fcs))))))
+
+
+        ;; this is old code
+        ;let cep (m1a1hitadjust * 36 - 35 * exp (-1 * targetrange / 9000)) ;; adjust our circular error probability
+        ;set m1a1hitrate (1 - exp (-.693147 * 100 / (cep * cep))) ;;adjust our m1a1hitrate
         ;show m1a1hitrate ;; print the hit rate (for debug)
+
+
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
         ;show m1a1_shot ;; print the randomly distributed uniform [0,1].
         ifelse m1a1_shot <= m1a1hitrate ;;check this random number against our hit probability...
           [
-            if m1a1-ammo-type = "sabot" ;; this is our damage model for our sabot round
+            if m1a1-main-gun = "120mm" ;; this is our damage model for our sabot round
             [
-            ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
+             ;;now that we've hit let's compute probability of kill
+              ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
-            if m1a1-ammo-type = "heat" ;;this is our damage model for our heat round
+            if m1a1-main-gun = "105mm" ;;this is our damage model for our heat round
             [
-            ask t72target [set hp hp - 0.5 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
+              ;;now that we've hit let's compute probability of kill
+              let p_k_105 (0.75 - .00068 * targetrange)
+
+              ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
@@ -421,9 +443,15 @@ end
 GRAPHICS-WINDOW
 601
 10
+<<<<<<< HEAD
 1421
 651
 40
+=======
+1221
+651
+30
+>>>>>>> origin/dev
 30
 10.0
 1
@@ -435,8 +463,13 @@ GRAPHICS-WINDOW
 1
 1
 1
+<<<<<<< HEAD
 -40
 40
+=======
+-30
+30
+>>>>>>> origin/dev
 -30
 30
 0
@@ -558,7 +591,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-20
+16
 1
 1
 NIL
@@ -612,39 +645,6 @@ M1A1_GPS
 1
 -1000
 
-SWITCH
-14
-794
-181
-827
-T72_Thermal_Sights
-T72_Thermal_Sights
-1
-1
--1000
-
-SWITCH
-15
-867
-210
-900
-T72_Turret_Stablization
-T72_Turret_Stablization
-1
-1
--1000
-
-SWITCH
-16
-904
-121
-937
-T72_GPS
-T72_GPS
-1
-1
--1000
-
 MONITOR
 277
 93
@@ -678,6 +678,7 @@ scale_factor_x
 1
 11
 
+<<<<<<< HEAD
 SLIDER
 19
 615
@@ -687,12 +688,14 @@ M1A1_Thermal_Sights_Range
 M1A1_Thermal_Sights_Range
 0
 2000
-2000
+1990
 1
 1
 meters
 HORIZONTAL
 
+=======
+>>>>>>> origin/dev
 TEXTBOX
 278
 59
@@ -702,21 +705,6 @@ Computed Values from Simulation
 11
 0.0
 1
-
-SLIDER
-16
-830
-268
-863
-T72_Thermal_Sights_Range
-T72_Thermal_Sights_Range
-50
-2000
-1300
-1
-1
-meters
-HORIZONTAL
 
 SLIDER
 16
@@ -937,7 +925,7 @@ CHOOSER
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
-1
+0
 
 SLIDER
 15
@@ -985,7 +973,7 @@ extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-22
+14
 1
 1
 NIL
@@ -1058,10 +1046,43 @@ CHOOSER
 568
 291
 613
-m1a1-ammo-type
-m1a1-ammo-type
-"heat" "sabot"
+m1a1-main-gun
+m1a1-main-gun
+"105mm" "120mm"
 1
+
+SWITCH
+17
+792
+184
+825
+T72_Thermal_Sights
+T72_Thermal_Sights
+1
+1
+-1000
+
+SWITCH
+194
+736
+300
+769
+m1a1-fcs
+m1a1-fcs
+0
+1
+-1000
+
+MONITOR
+362
+96
+441
+141
+NIL
+p_k_105mm
+6
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
