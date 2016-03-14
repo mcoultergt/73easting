@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -233,20 +233,18 @@ end
 
 to go
   ;;sanity check and make sure somehow our tanks didn't all destroy each other
-  if not any? t72s [ stop ]
+  if not any? t72s  [stop]
   if not any? m1a1s [stop]
   ask m1a1s
   [
     move
     detect
     m1a1engage
-    death
   ]
   ask t72s
   [
     ;;based on historical data the Iraqi Republican Guard tanks didn't move during the battle.
     t72engage
-    death
   ]
   tick
   clear-links ;; reset links so we can see missed shots (if we're looking...)
@@ -268,7 +266,7 @@ to move
 ;;TODO - Comment this code!
 to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
-  let m1a1targets t72s in-radius ( 2500 - ridgeline_x_meter ) ;;find any T-72s in visual range, changed to include ridge...)
+  let m1a1targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...)
   let direction_of_view heading - 45 + random 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
@@ -306,6 +304,7 @@ to detect
        if random_detect <= p_detection
        [
          set t72target self
+         show t72target
         ;show t72target
        ]
      ]
@@ -318,11 +317,8 @@ to m1a1engage
   ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
   if crest = 1
   [
-    ;;let m1a1targets t72s in-radius m1a1max_engagement_range ;;find any T-72s in our max engagement range iff we're over the ridge line
-    ;;let target min-one-of m1a1targets [distance myself] ;; engage the closest T72
-    let shoot false
-    if t72target != nobody [ set shoot true ] ;;if there's somebody in range
-    if shoot = true
+    ;let shoot false
+    if t72target != 0
     [
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
@@ -340,22 +336,28 @@ to m1a1engage
             [
              ;;now that we've hit let's compute probability of kill
               ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
+              ask t72target [if hp <= 0 [ die ]] ;;check
             ]
             if m1a1-main-gun = "105mm" ;;this is our damage model for our heat round
             [
               ;;now that we've hit let's compute probability of kill
               set p_k_105 (0.75 - .00068 * targetrange)
               ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
+              ask t72target [if hp <= 0 [ die ]] ;;check
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
           [
             set label "Miss!" ;;else label the M1A1 that fired as having missed.
           ]
+
         set fired 3 ;; reset at the end of 3 move turns (set in the 'move' function) we're going to let our turtle fire again. this should 'slow down' the simulation.
     ]
   ]
-]
+    ]
+
+
+
 
 end
 
@@ -389,15 +391,17 @@ to t72engage
           [
             ;; since we've hit let's see if armor is on
             ifelse m1a1_armor = 0
-            [let p_k_t72 (0.99 - 0.00018 * targetrangem1a1)]
-            [let p_k_t72 (0.89 - 0.00028 * targetrangem1a1)]
+            [set p_k_t72 (0.99 - 0.00018 * targetrangem1a1)]
+            [set p_k_t72 (0.89 - 0.00028 * targetrangem1a1)]
             let t72_shot_kill random-float 1 ;;have a randomly distributed uniform [0,1].
             if t72_shot_kill <= p_k_t72
             [
             ask target [set hp hp - 1]
+            ask target [if hp <= 0 [ die ]]
             ]
           ]
       set fired 3 ;;reset our fired for t72s.
+
     ]
     ]
   ]
@@ -579,7 +583,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-10
+20
 1
 1
 NIL
@@ -607,7 +611,7 @@ SWITCH
 609
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
-1
+0
 1
 -1000
 
@@ -906,7 +910,7 @@ desert-visibility
 desert-visibility
 0
 20000
-6590
+50
 1
 1
 meters
@@ -919,7 +923,7 @@ SWITCH
 374
 extra-t72s
 extra-t72s
-0
+1
 1
 -1000
 
@@ -943,7 +947,7 @@ extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-14
+22
 1
 1
 NIL
@@ -1019,7 +1023,7 @@ CHOOSER
 m1a1-main-gun
 m1a1-main-gun
 "105mm" "120mm"
-0
+1
 
 SWITCH
 17
@@ -1028,7 +1032,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-0
+1
 1
 -1000
 
@@ -1061,9 +1065,20 @@ SWITCH
 647
 m1a1-upgraded-armor
 m1a1-upgraded-armor
-0
+1
 1
 -1000
+
+MONITOR
+355
+145
+414
+191
+NIL
+p_k_t72
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
