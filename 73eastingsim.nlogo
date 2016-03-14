@@ -282,22 +282,26 @@ to detect
    ;;write "target direction" ;;removed this line as it was slowing down the simulation... too much information!
    ;;show target_direction ;;removed this line as it was slowing down the simulation... too much information!
      if direction_of_view - 9 < target_direction and direction_of_view + 9 > target_direction
-     [ ;write "range"
-       ;show distance turtle 1 / scale_factor_x / 1000
+     [
+       let range (distance myself) / scale_factor_x
        ;; TODO
        ;;add in carefully here to suppress error where there's nothing to aim at...
-       carefully
-       [set tau 6.8 * 8 * distance turtle 1 / 14.85 / 2.93 / 1000 / scale_factor_x]
-       [set tau 1] ;;set tau to one to prevent divide by zero errors.
+       ;carefully
+       ;[set tau 6.8 * 8 * distance turtle 1 / 14.85 / 2.93 / 1000 / scale_factor_x]
+       ;[set tau 1] ;;set tau to one to prevent divide by zero errors.
        ;;need to fix this before final commit!
        ;write "tau ="
        ;show tau
+       ifelse  M1A1_Thermal_Sights
+       [ set p_detection 0.99 ]
+       [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
        set p_detection 1 - exp (-30 / tau)
        ;write "probability of detection"
        ;show p_detection
        set random_detect random 1
        if random_detect <= p_detection
        [
+
         set t72target self
         ;show t72target
        ]
