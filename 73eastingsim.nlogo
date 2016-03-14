@@ -383,6 +383,7 @@ to t72engage
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
           [
+            ;;since we've hit let's do a p_k_t72
             ask target [set hp hp - 1]
           ]
       set fired 3 ;;reset our fired for t72s.
@@ -595,7 +596,7 @@ SWITCH
 609
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
-0
+1
 1
 -1000
 
@@ -1041,6 +1042,17 @@ p_k_105
 6
 1
 11
+
+SWITCH
+16
+614
+196
+647
+m1a1-upgraded-armor
+m1a1-upgraded-armor
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
