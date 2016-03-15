@@ -46,13 +46,13 @@ to reset
   ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
   set M1A1_GPS true
-  set m1a1-formation "|"
+  set m1a1-formation "Line"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
   ;set T72_Thermal_Sights_Range 1300
   ;set T72_Turret_Stablization false
   ;set T72_GPS false
-  set t72-formation "|"
+  set t72-formation "Line"
   set t72-spacing 10
   set Desert_Length_In_Meters 10000
   set Desert_Height_In_Meters 10000
@@ -446,9 +446,9 @@ end
 GRAPHICS-WINDOW
 601
 10
-1221
+1421
 651
-30
+40
 30
 10.0
 1
@@ -460,8 +460,8 @@ GRAPHICS-WINDOW
 1
 1
 1
--30
-30
+-40
+40
 -30
 30
 0
@@ -553,7 +553,7 @@ lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--4
+-20
 1
 1
 NIL
@@ -611,7 +611,7 @@ SWITCH
 609
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
-0
+1
 1
 -1000
 
@@ -858,7 +858,7 @@ CHOOSER
 951
 t72-formation
 t72-formation
-"|" "<" ">" "backslash" "/"
+"Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
@@ -898,7 +898,7 @@ CHOOSER
 734
 m1a1-formation
 m1a1-formation
-"|" "<" ">" "backslash" "/"
+"Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
@@ -923,7 +923,7 @@ SWITCH
 374
 extra-t72s
 extra-t72s
-1
+0
 1
 -1000
 
@@ -934,7 +934,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-1
+0
 1
 -1000
 
@@ -1073,7 +1073,7 @@ MONITOR
 355
 145
 414
-191
+190
 NIL
 p_k_t72
 17
