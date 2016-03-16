@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72 p_detection t72targets]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -187,9 +187,9 @@ to setup-technology
       ifelse M1A1_GPS = True
        [set M1A1gps 1]
        [set M1A1gps 0]
-      ifelse m1a1-fcs
-       [set M1A1_fcs 1]
-       [set M1A1_fcs 0]
+      ;ifelse m1a1-fcs
+      ; [set M1A1_fcs 1]
+      ; [set M1A1_fcs 0]
 
        ifelse m1a1-upgraded-armor = True
        [set m1a1_armor 1]
@@ -1103,6 +1103,21 @@ p_detection
 17
 1
 11
+
+SLIDER
+365
+772
+537
+805
+M1A1_fcs
+M1A1_fcs
+0
+1
+0.0637
+0.0001
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
