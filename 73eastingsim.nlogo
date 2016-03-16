@@ -165,7 +165,8 @@ to setup-t72s
   create-ordered-t72s 17 ;; we're going to make our circle of T72s using the same parameters as the other T72s
       [
       setxy coil_middle_t72_x_cor coil_middle_t72_y_cor
-      fd 10
+      ifelse max-pxcor - coil_middle_t72_x_cor < 10
+      [fd max-pxcor - coil_middle_t72_x_cor ][fd 10]
       set color red
       set size 5
       set hp 1
@@ -261,6 +262,7 @@ to move
    [
    set crest 1 ;; set our crest variable if they've gone over the hill
    ]
+
    end
 
 ;;TODO - Comment this code!
