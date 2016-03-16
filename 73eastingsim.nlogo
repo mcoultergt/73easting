@@ -304,10 +304,10 @@ to detect
        ifelse M1A1thermal_sights = 1
        [ set p_detection 0.99 ]
        [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
-       set random_detect random 1
+       set random_detect random-float 1
        if random_detect <= p_detection
        [
-         set t72target self
+         set t72target myself
          show t72target
         ;show t72target
        ]
@@ -322,7 +322,7 @@ to m1a1engage
   if crest = 1
   [
     ;let shoot false
-    if t72target != 0
+    if t72target != nobody
     [
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
@@ -368,10 +368,10 @@ to t72engage
   ;; convert our patches into distance...
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
   let t72max_engagement_range t72thermal_sights_range / scale_factor_x ;; set the farthest away patch the M1A1s can engage
-  let t72targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
-  if t72targets != nobody
+  let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
+  if m1a1targets != nobody
   [
-    let target min-one-of t72targets [distance myself] ;; engage the closest M1A1
+    let target min-one-of m1a1targets [distance myself] ;; engage the closest M1A1
       if target != nobody
       [
     let targetrangem1a1 [distance myself] of target / scale_factor_x
