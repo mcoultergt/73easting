@@ -247,6 +247,8 @@ to go
     t72engage
   ]
   tick
+  ask t72s [if hp <= 0 [ die ]]
+  ask m1a1s [if hp <= 0 [ die ]]
   clear-links ;; reset links so we can see missed shots (if we're looking...)
 end
 
@@ -336,14 +338,12 @@ to m1a1engage
             [
              ;;now that we've hit let's compute probability of kill
               ask t72target [set hp hp - 1 set label "Destroyed!"] ;; And destoy the target tank if we're <= that probability for heat round
-              ask t72target [if hp <= 0 [ die ]] ;;check
             ]
             if m1a1-main-gun = "105mm" ;;this is our damage model for our heat round
             [
               ;;now that we've hit let's compute probability of kill
               set p_k_105 (0.75 - .00068 * targetrange)
               ask t72target [set hp hp - p_k_105 set label "Heat - Hit!"] ;; And destoy the target tank if we're <= that probability for heat round
-              ask t72target [if hp <= 0 [ die ]] ;;check
             ]
             set label "Fire!" ;; label the M1A1 that fired as such
           ]
@@ -397,7 +397,6 @@ to t72engage
             if t72_shot_kill <= p_k_t72
             [
             ask target [set hp hp - 1]
-            ask target [if hp <= 0 [ die ]]
             ]
           ]
       set fired 3 ;;reset our fired for t72s.
@@ -1073,7 +1072,7 @@ MONITOR
 355
 145
 414
-191
+190
 NIL
 p_k_t72
 17
