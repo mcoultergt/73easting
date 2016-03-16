@@ -274,7 +274,7 @@ to detect
   ;show "entering detect"
   ifelse crest != 1
   [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor )] ;;find any T-72s in visual range, changed to include ridge...)
-  [set t72targets t72s in-radius ( ( max-pycor ))] ;;find any T-72s in visual range, changed to include ridge...)
+  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ))] ;;find any T-72s in visual range AFTER the ridge...)
   let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
