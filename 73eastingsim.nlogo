@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72 p_detection]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -270,6 +270,7 @@ to move
 ;;TODO - Comment this code!
 to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
+  ;show "entering detect"
   let t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...)
   let direction_of_view heading - 45 + random 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
@@ -280,10 +281,12 @@ to detect
   let delta_y 0
   let target_direction 0
   let tau 0
-  let p_detection 0
+  ;let p_detection 0
   let random_detect 0
   ask t72targets
-  [set target_x_pos xcor
+  [
+    ;show "asking t72targets"
+   set target_x_pos xcor
    set target_y_pos ycor
    set delta_x target_x_pos - tank_x_pos
    set delta_y target_y_pos - tank_y_pos
@@ -292,6 +295,7 @@ to detect
    ;;show target_direction ;;removed this line as it was slowing down the simulation... too much information!
      if direction_of_view - 9 < target_direction and direction_of_view + 9 > target_direction
      [
+       ;show "target direction..."
        let range (distance myself) / scale_factor_x
        ;; TODO
        ;;add in carefully here to suppress error where there's nothing to aim at...
@@ -302,13 +306,16 @@ to detect
        ;write "tau ="
        ;show tau
        ifelse M1A1thermal_sights = 1
-       [ set p_detection 0.99 ]
+       [ set p_detection 0.99
+         ;show "set thermal sights"
+         ]
        [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
        set random_detect random-float 1
        if random_detect <= p_detection
        [
-         set t72target myself
-         show t72target
+         ;show "setting t72target!"
+         set t72target self
+         ;show t72target
         ;show t72target
        ]
      ]
@@ -319,6 +326,8 @@ to m1a1engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
   ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
+  if t72target != 0
+  [
   if crest = 1
   [
     ;let shoot false
@@ -357,7 +366,7 @@ to m1a1engage
     ]
   ]
     ]
-
+  ]
 
 
 
@@ -612,7 +621,7 @@ SWITCH
 609
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
-1
+0
 1
 -1000
 
@@ -1077,6 +1086,17 @@ MONITOR
 190
 NIL
 p_k_t72
+17
+1
+11
+
+MONITOR
+501
+172
+580
+217
+NIL
+p_detection
 17
 1
 11
