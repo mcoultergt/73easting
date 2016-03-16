@@ -271,8 +271,10 @@ to move
 to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
   ;show "entering detect"
-  let t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...)
-  let direction_of_view heading - 45 + random 90 ;;
+  ifelse crest != 1
+  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...) ]
+  [set t72targets t72s in-radius ( ( max-pycor ) ;;find any T-72s in visual range, changed to include ridge...)]]
+  let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
   let target_x_pos 0
@@ -632,7 +634,7 @@ SWITCH
 687
 M1A1_Turret_Stablization
 M1A1_Turret_Stablization
-0
+1
 1
 -1000
 
@@ -1033,7 +1035,7 @@ CHOOSER
 m1a1-main-gun
 m1a1-main-gun
 "105mm" "120mm"
-1
+0
 
 SWITCH
 17
