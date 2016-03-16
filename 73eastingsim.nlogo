@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72 p_detection]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target M1A1_fcs p_k_105 m1a1_armor p_k_t72 p_detection t72targets]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -103,6 +103,7 @@ to setup-m1a1s
 
     set current-m1a1s current-m1a1s - 1
   ]
+  set t72targets 0
   ;;if we have an even number of M1A1s we need to make the line accordingly.
   ;let initial-number-m1a1-mod initial-number-m1a1 - 1
   ;if initial-number-m1a1 mod 2 = 0 [ask m1a1 initial-number-m1a1-mod [die] ] ;; mod 2
@@ -272,8 +273,8 @@ to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
   ;show "entering detect"
   ifelse crest != 1
-  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...) ]
-  [set t72targets t72s in-radius ( ( max-pycor ) ;;find any T-72s in visual range, changed to include ridge...)]]
+  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor )] ;;find any T-72s in visual range, changed to include ridge...)
+  [set t72targets t72s in-radius ( ( max-pycor ))] ;;find any T-72s in visual range, changed to include ridge...)
   let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
