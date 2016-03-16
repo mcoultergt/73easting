@@ -270,7 +270,7 @@ to move
 ;;TODO - Comment this code!
 to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
-  let m1a1targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...)
+  let t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ;;find any T-72s in visual range, changed to include ridge...)
   let direction_of_view heading - 45 + random 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
@@ -282,7 +282,7 @@ to detect
   let tau 0
   let p_detection 0
   let random_detect 0
-  ask m1a1targets
+  ask t72targets
   [set target_x_pos xcor
    set target_y_pos ycor
    set delta_x target_x_pos - tank_x_pos
@@ -327,7 +327,7 @@ to m1a1engage
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
         create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
-        ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
+        ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         let targetrange [distance myself] of t72target * scale_factor_x
         set m1a1hitrate (1 / (1 + (exp (targetrange / (475.2 + (M1A1_fcs * 235.2)) - (3.31 + (-0.438 * M1A1_fcs))))))
 
@@ -410,10 +410,10 @@ to t72engage
   ]
 end
 
-to death  ;; turtle procedure
-  ;;when energy dips below zero, die
-  if hp <= 0 [ die ]
-end
+;to death  ;; turtle procedure
+;  ;;when energy dips below zero, die
+;  if hp <= 0 [ die ]
+;end
 
 ;;to display-labels
 ;;  ask turtles [ set label "" ]
