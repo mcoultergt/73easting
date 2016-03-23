@@ -13,7 +13,7 @@ globals [sand M1A1turret_stab driftdegree M1A1gps T72thermal_sights m1a1hitrate 
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
-m1a1s-own [hp fired time_since_shot shot_at crest]       ;; both t72s and m1a1s have hit points
+m1a1s-own [hp fired time_since_shot shot_at shoot_stop crest]       ;; both t72s and m1a1s have hit points
 t72s-own [hp fired time_since_shot shot_at]    ;; both t72s and m1a1s have hit points
 
 to setup
@@ -45,7 +45,7 @@ to reset
   set M1A1_Thermal_Sights 1
   ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
-  set M1A1_GPS true
+  set M1A1_GPS 1
   set m1a1-formation "Line"
   set m1a1-spacing 10
   set t72-formation "Line"
@@ -63,6 +63,8 @@ to setup-m1a1s
   let m1a1-normalized-spacing_x ((m1a1-spacing / 100) * ( max-pxcor)) / initial-number-m1a1 ;;normalize our m1a1 spacing...
   let m1a1-normalized-spacing_y ((m1a1-spacing / 100) * ( max-pycor)) / initial-number-m1a1 ;;normalize our m1a1 spacing...
   let current-m1a1s initial-number-m1a1 ;;initialize counter
+  ask m1a1s
+     [set shoot_stop 1]
   ;;initailize loop and let it: create n number of m1a1s with size 5, color blue, facing EAST and in a line, increment counter
   while [current-m1a1s >= (1)]
   [
@@ -173,6 +175,9 @@ to setup-t72s
 end
 
 to setup-technology
+  ifelse M1A1_Turret_Stablization = True
+       [set M1A1turret_stab 1]
+       [set M1A1turret_stab 0]
 end
 
 to setup-desert
@@ -202,7 +207,7 @@ let inbattle 0
 let movetobattle 0
 
 ask m1a1s
-[set movetobattle heading] 
+[set movetobattle heading]
 ask m1a1s
 [if fired > inbattle
   [set inbattle fired
@@ -233,7 +238,7 @@ to go
   ask t72s [if hp <= 0 [ die ]]
   ask m1a1s [if hp <= 0 [ die ]]
   clear-links ;; reset links so we can see missed shots (if we're looking...)
-end  
+end
 
 to move
    ;; our M1A1s are going to be moving towards the right
@@ -241,20 +246,23 @@ to move
    ;;ifelse M1A1_GPS = True
    ;;[fd m1a1_move_speed]
    ;;show driftdegree
-   set heading driftdegree
-   fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
-   set fired fired - 1 ;;go ahead and decrement the 'fired' variable
-   if pxcor >= ridgeline_x_cor
-   [
-   set crest 1 ;; set our crest variable if they've gone over the hill
+   if shoot_stop < 1
+   [set heading driftdegree
+    fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
+    set fired fired - 1 ;;go ahead and decrement the 'fired' variable
+    if pxcor >= ridgeline_x_cor
+     [
+     set crest 1 ;; set our crest variable if they've gone over the hill
+     ]
    ]
+   set shoot_stop shoot_stop - 1
 
-   end
+end
 
 ;;TODO - Comment this code!
 to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
-  ;show "entering detect"  
+  ;show "entering detect"
   ifelse crest != 1
   [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor )] ;;find any T-72s in visual range, changed to include ridge...)
   [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ))] ;;find any T-72s in visual range AFTER the ridge...)
@@ -285,21 +293,21 @@ to detect
        [
          set t72target self
        ]
-     ] 
+     ]
    ]
   end
 
 to t72detect
   let t72max_engagement_range 0
   let localt72thermal 0
-    ifelse desert-visibility < 800 
+    ifelse desert-visibility < 800
     [set localt72thermal 1
      set t72max_engagement_range 800
     ]
     [set localt72thermal 0
-     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye   
+     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
     ]
-  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range  
+  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
   ;;show direction_of_view
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
@@ -314,8 +322,8 @@ to t72detect
   [
    set target_x_pos xcor
    set target_y_pos ycor
-   set delta_x target_x_pos - tank_x_pos 
-   set delta_y target_y_pos - tank_y_pos 
+   set delta_x target_x_pos - tank_x_pos
+   set delta_y target_y_pos - tank_y_pos
    set t72_target_direction atan delta_x delta_y
      if direction_of_view - 5 < target_direction and direction_of_view + 5 > target_direction
      [
@@ -363,11 +371,14 @@ to m1a1engage
               if m1pkrand < m1a1p_kill
                [
                  ask t72target [set hp hp - m1a1p_kill set label "Killed!"] ;; And destoy the target tank if we're <= that probability for heat round
-               ] 
-          
+               ]
+
           ]
           [set label "Miss!"] ;;else label the M1A1 that fired as having missed.
            set fired 3 ;; reset at the end of 3 move turns (set in the 'move' function) we're going to let our turtle fire again. this should 'slow down' the simulation.
+           if M1A1turret_stab < 1
+            [set shoot_stop 2 ;;;fire on the move
+            ]
       ]
       ]
     ]
