@@ -18,6 +18,7 @@ t72s-own [hp fired time_since_shot shot_at]    ;; both t72s and m1a1s have hit p
 
 to setup
   clear-all
+  file-open "results.txt"
   ask patches [ set pcolor brown ] ;;goahead and set the initial desert color to sand...
   setup-m1a1s   ;; create the m1a1s, then initialize their variables
   setup-t72s ;; create the t72s, then initialize their variables
@@ -499,10 +500,10 @@ to t72engage
 end
 
 to easting_report
-  file-open "results.txt"
   ask m1a1s
   [file-print hp]
   file-print "Hello World"
+  file-close "results.txt"
   ;export-plot "Number Of Tanks" "plot.csv"
   set number_of_iterations number_of_iterations - 1
   ifelse number_of_iterations > 0
