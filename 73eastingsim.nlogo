@@ -8,7 +8,7 @@
 ;; narrowly - invest in new technology/sights/etc
 ;; ==================END NOTES==================
 
-
+extensions [profiler]
 globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
@@ -355,8 +355,6 @@ to detect
          ;show t72target
         ;show t72target
        ]
-;<<<<<<< HEAD
-;=======
      ]
    ]
   end
@@ -503,7 +501,7 @@ to easting_report
   ask m1a1s
   [file-print hp]
   file-print "Hello World"
-  file-close "results.txt"
+  file-close;"results.txt"
   ;export-plot "Number Of Tanks" "plot.csv"
   set number_of_iterations number_of_iterations - 1
   ifelse number_of_iterations > 0
@@ -705,7 +703,7 @@ lead_t72_y_cor
 lead_t72_y_cor
 min-pycor
 max-pycor
-6
+0
 1
 1
 NIL
@@ -763,7 +761,7 @@ Desert_Length_In_Meters
 Desert_Length_In_Meters
 100
 100000
-10000
+1751
 1
 1
 meters
@@ -778,7 +776,7 @@ Desert_Height_In_Meters
 Desert_Height_In_Meters
 100
 100000
-10000
+1765
 1
 1
 meters
@@ -1102,10 +1100,27 @@ INPUTBOX
 684
 481
 number_of_iterations
-967
+833
 1
 0
 Number
+
+BUTTON
+351
+275
+422
+308
+Profiler
+setup                  ;; set up the model\nprofiler:start         ;; start profiling\nrepeat 500 [ go ]       ;; run something you want to measure\nprofiler:stop          ;; stop profiling\nprint profiler:report  ;; view the results\nprofiler:reset         ;; clear the data
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
