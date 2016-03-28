@@ -337,7 +337,7 @@ to detect
        [ set p_detection 0.99
          ;show "set thermal sights"
          ]
-       [ set p_detection (1 / ( 1 + exp (( range / 1154) - 1.75 )))]
+       [ set p_detection (1 / ( 1 + exp (( range / (1154 + ( 11788.68 * M1A1_Thermal_Sights ) )  - ( 1.75 + (8.259 * M1A1_Thermal_Sights))))))]
        set random_detect random-float 1
        if random_detect <= p_detection
        [
@@ -353,7 +353,7 @@ to detect
   end
 
 to t72detect
-  let t72max_engagement_range 0
+   let t72max_engagement_range 0
   let localt72thermal 0
     ifelse desert-visibility < 800
     [set localt72thermal 1
@@ -384,9 +384,13 @@ to t72detect
      [
        let range (distance myself) / scale_factor_x
        set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * localt72thermal)) - (1.75 + (.5475 * localt72thermal)))))
-;>>>>>>> origin/slynch31-patch-1
      ]
   ]
+     set random_detect random-float 1
+     if random_detect <= p_detectioniraqi
+       [
+       set m1a1target self
+       ]
   end
 
 
@@ -710,7 +714,7 @@ SWITCH
 724
 M1A1_GPS
 M1A1_GPS
-0
+1
 1
 -1000
 
