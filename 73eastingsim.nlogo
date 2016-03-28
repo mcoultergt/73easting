@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -33,7 +33,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  set m1a1-main-gun "120mm"
+  ;set m1a1-main-gun "1"
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -249,7 +249,7 @@ ask m1a1s
   set movetobattle target_direction
   ]
 ]
-set driftdegree (movetobattle + (2 - (random-float 4)) * (1 - M1A1_GPS))
+set driftdegree (movetobattle + (2 - (random-float 4)) * (1 - m1a1GPS))
 end
 
 ;;;>>>>>>> origin/slynch31-patch-1
@@ -257,6 +257,7 @@ to go
   ;;sanity check and make sure somehow our tanks didn't all destroy each other
   if not any? t72s  [stop]
   if not any? m1a1s [stop]
+  drift
   ask m1a1s
   [
     move
@@ -281,7 +282,8 @@ to move
    ;;[fd m1a1_move_speed]
    ;;show driftdegree
    if shoot_stop < 1
-   [set heading driftdegree
+   [
+    set heading driftdegree
     fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
     set fired fired - 1 ;;go ahead and decrement the 'fired' variable
     if pxcor >= ridgeline_x_cor
@@ -679,7 +681,7 @@ lead_t72_y_cor
 lead_t72_y_cor
 min-pycor
 max-pycor
-0
+6
 1
 1
 NIL
@@ -703,7 +705,7 @@ SWITCH
 687
 M1A1_Turret_Stablization
 M1A1_Turret_Stablization
-1
+0
 1
 -1000
 
@@ -714,7 +716,7 @@ SWITCH
 724
 M1A1_GPS
 M1A1_GPS
-1
+0
 1
 -1000
 
@@ -966,7 +968,7 @@ m1a1-spacing
 m1a1-spacing
 0
 100
-10
+38
 1
 1
 NIL
@@ -1004,7 +1006,7 @@ SWITCH
 374
 extra-t72s
 extra-t72s
-0
+1
 1
 -1000
 
@@ -1015,7 +1017,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-0
+1
 1
 -1000
 
@@ -1096,16 +1098,6 @@ NIL
 NIL
 1
 
-CHOOSER
-199
-568
-291
-613
-m1a1-main-gun
-m1a1-main-gun
-"105mm" "120mm"
-0
-
 SWITCH
 17
 792
@@ -1113,7 +1105,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-1
+0
 1
 -1000
 
@@ -1146,7 +1138,7 @@ SWITCH
 647
 m1a1-upgraded-armor
 m1a1-upgraded-armor
-1
+0
 1
 -1000
 
@@ -1181,7 +1173,7 @@ M1A1_fcs
 M1A1_fcs
 0
 1
-0.0637
+1
 0.0001
 1
 NIL
