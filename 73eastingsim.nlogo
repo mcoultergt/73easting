@@ -218,7 +218,7 @@ to setup-move
   ;; from open source documentation, the top speed (off road) of a M1A1 is 48km/h.
   ;; and since we know our scale factors, we can get that each M1A1 should move 48e-3 * scale_factor per tick...we'll use scale factor X just to be simple.
   set m1a1_move_speed 48000 / 3600 * scale_factor_x ;; M1A1 speed is 48kmh ==> 48000m/h ==> 48000m/3600s  get our move speed in m/s (will be 13.3m/s)
-  show scale_factor_x
+  ;show scale_factor_x
 end
 
 
@@ -255,8 +255,14 @@ end
 ;;;>>>>>>> origin/slynch31-patch-1
 to go
   ;;sanity check and make sure somehow our tanks didn't all destroy each other
-  if not any? t72s  [stop]
-  if not any? m1a1s [stop]
+  if not any? t72s
+  [
+    easting_report
+   ]
+  if not any? m1a1s
+  [
+    easting_report
+  ]
   drift
   ask m1a1s
   [
@@ -492,6 +498,23 @@ to t72engage
   ]
 end
 
+to easting_report
+  file-open "results.txt"
+  ask m1a1s
+  [file-print hp]
+  file-print "Hello World"
+  ;export-plot "Number Of Tanks" "plot.csv"
+  set number_of_iterations number_of_iterations - 1
+  ifelse number_of_iterations > 0
+  [
+  setup
+  go
+  ]
+  [
+    stop
+  ]
+end
+
 ;to death  ;; turtle procedure
 ;  ;;when energy dips below zero, die
 ;  if hp <= 0 [ die ]
@@ -720,39 +743,6 @@ M1A1_GPS
 1
 -1000
 
-MONITOR
-277
-93
-357
-138
-NIL
-m1a1hitrate
-7
-1
-11
-
-MONITOR
-277
-141
-346
-186
-NIL
-t72hitrate
-17
-1
-11
-
-MONITOR
-277
-193
-372
-238
-NIL
-scale_factor_x
-17
-1
-11
-
 TEXTBOX
 278
 59
@@ -792,47 +782,6 @@ Desert_Height_In_Meters
 1
 meters
 HORIZONTAL
-
-MONITOR
-278
-241
-404
-286
-Current P_hit of T72
-t72_shot
-7
-1
-11
-
-MONITOR
-278
-289
-414
-334
-Current P_hit of M1A1
-m1a1_shot
-7
-1
-11
-
-PLOT
-277
-336
-477
-486
-Number Of Tanks
-Time
-# Of Tanks
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -13345367 true "" "plot count m1a1s"
-"pen-1" 1.0 0 -2674135 true "" "plot count t72s"
 
 TEXTBOX
 20
@@ -1120,17 +1069,6 @@ m1a1-fcs
 1
 -1000
 
-MONITOR
-362
-96
-441
-141
-NIL
-p_k_105
-6
-1
-11
-
 SWITCH
 16
 614
@@ -1141,28 +1079,6 @@ m1a1-upgraded-armor
 0
 1
 -1000
-
-MONITOR
-355
-145
-414
-190
-NIL
-p_k_t72
-17
-1
-11
-
-MONITOR
-501
-172
-580
-217
-NIL
-p_detection
-17
-1
-11
 
 SLIDER
 365
@@ -1178,6 +1094,17 @@ M1A1_fcs
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+529
+421
+684
+481
+number_of_iterations
+967
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
