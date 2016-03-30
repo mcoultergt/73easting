@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
+globals [sand driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -18,9 +18,9 @@ t72s-own [hp fired time_since_shot shot_at]    ;; both t72s and m1a1s have hit p
 
 to setup
   clear-all
-  file-close
+  ;file-close
   ;file-delete "results.txt"
-  file-open "results.txt"
+  ;file-open "results.txt"
   ask patches [ set pcolor brown ] ;;goahead and set the initial desert color to sand...
   setup-m1a1s   ;; create the m1a1s, then initialize their variables
   setup-t72s ;; create the t72s, then initialize their variables
@@ -45,9 +45,9 @@ to reset
   set coil-t72s true
   set coil_middle_t72_x_cor 35
   set coil_middle_t72_y_cor 10
-  set M1A1_Thermal_Sights 1
+  ;set M1A1_Thermal_Sights 1
   ;set M1A1_Thermal_Sights_Range 2000
-  set M1A1_Turret_Stablization true
+  ;set M1A1_Turret_Stablization true
   ;set M1A1_GPS true
   set m1a1-formation "Line"
   set m1a1-spacing 10
@@ -182,9 +182,9 @@ to setup-t72s
 end
 
 to setup-technology
-  ifelse M1A1_Turret_Stablization = True
-       [set M1A1turret_stab 1]
-       [set M1A1turret_stab 0]
+  ;ifelse M1A1_Turret_Stablization = True
+  ;     [set M1A1turret_stab 1]
+  ;     [set M1A1turret_stab 0]
 
 ;;;<<<<<<< HEAD
 ;  ;;take the booleans and convert into 0 or 1...
@@ -390,7 +390,7 @@ to detect
   end
 
 to t72detect
-  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
+  let m1a1targets m1a1s in-radius (t72max_engagement_range) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
   ;;show direction_of_view
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
@@ -647,7 +647,7 @@ initial-number-m1a1
 initial-number-m1a1
 0
 200
-11
+9
 1
 1
 m1a1
@@ -662,7 +662,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-13
+8
 1
 1
 t72
@@ -728,17 +728,6 @@ max-pycor
 NIL
 HORIZONTAL
 
-SWITCH
-19
-654
-224
-687
-M1A1_Turret_Stablization
-M1A1_Turret_Stablization
-0
-1
--1000
-
 TEXTBOX
 278
 59
@@ -758,7 +747,7 @@ Desert_Length_In_Meters
 Desert_Length_In_Meters
 100
 100000
-3402
+2990
 1
 1
 meters
@@ -773,7 +762,7 @@ Desert_Height_In_Meters
 Desert_Height_In_Meters
 100
 100000
-3014
+3430
 1
 1
 meters
@@ -912,8 +901,8 @@ SLIDER
 desert-visibility
 desert-visibility
 0
-20000
-5202
+4000
+2007
 1
 1
 meters
@@ -1025,7 +1014,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-0
+1
 1
 -1000
 
@@ -1038,7 +1027,7 @@ M1A1_fcs
 M1A1_fcs
 0
 1
-0
+1
 0.0001
 1
 NIL
@@ -1081,7 +1070,7 @@ M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-0
+1
 0.000001
 1
 NIL
@@ -1126,7 +1115,22 @@ m1a1-main-gun
 m1a1-main-gun
 0
 1
-2.1E-5
+1
+0.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+219
+421
+391
+454
+M1A1Turret_stab
+M1A1Turret_stab
+0
+1
+1
 0.000001
 1
 NIL
