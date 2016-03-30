@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun ridgeline_x_cor]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range  T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun ridgeline_x_cor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -36,7 +36,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  ;set m1a1-main-gun "1"
+  set m1a1-main-gun 1
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -45,7 +45,7 @@ to reset
   set coil-t72s true
   set coil_middle_t72_x_cor 35
   set coil_middle_t72_y_cor 10
-  set M1A1_Thermal_Sights true
+  set M1A1_Thermal_Sights 1
   ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
   set M1A1_GPS true
@@ -182,36 +182,40 @@ to setup-t72s
 end
 
 to setup-technology
-;;<<<<<<< HEAD
-  ;;take the booleans and convert into 0 or 1...
-		ifelse M1A1_Turret_Stablization = True
+  ifelse M1A1_Turret_Stablization = True
        [set M1A1turret_stab 1]
        [set M1A1turret_stab 0]
-      ifelse M1A1_Thermal_Sights = True
-       [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-       [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
-      ifelse M1A1_GPS = True
-       [set M1A1gps 1]
-       [set M1A1gps 0]
+
+;;;<<<<<<< HEAD
+;  ;;take the booleans and convert into 0 or 1...
+		;ifelse M1A1_Turret_Stablization = True
+       ;[set M1A1turret_stab 1]
+       ;[set M1A1turret_stab 0]
+      ;ifelse M1A1_Thermal_Sights = True
+      ; [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
+      ; [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
+      ;ifelse M1A1_GPS = True
+      ; [set M1A1gps 1]
+      ; [set M1A1gps 0]
       ;ifelse m1a1-fcs
       ; [set M1A1_fcs 1]
       ; [set M1A1_fcs 0]
 
-       ifelse m1a1-upgraded-armor = True
-       [set m1a1_armor 1]
-       [set m1a1_armor 0]
+      ; ifelse m1a1-upgraded-armor = True
+      ; [set m1a1_armor 1]
+      ; [set m1a1_armor 0]
      ; ifelse T72_Turret_Stablization = True
      ;  [set T72turret_stab 1]
      ;  [set T72turret_stab 0]
-      ifelse T72_Thermal_Sights = True
-       [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
-       [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
+     ; ifelse T72_Thermal_Sights = True
+     ;  [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
+     ;  [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
      ; ifelse T72_GPS = True
      ;  [set T72gps 1]
      ; [set T72gps 0]
   ;;second iteration hit rate
-  set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
-  set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
+  ;set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
+  ;set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
   ;;in here we'll setup up our technology variables
   ;; note for all this the point of the model isn't to see if the technology should be IMPROVED at all, it's to see if a
   ;; tangible difference exists for having the technology in the first place.
@@ -223,6 +227,9 @@ to setup-move
   set m1a1_move_speed 48000 / 3600 * scale_factor_x ;; M1A1 speed is 48kmh ==> 48000m/h ==> 48000m/3600s  get our move speed in m/s (will be 13.3m/s)
   ;show scale_factor_x
 end
+
+;to drift
+;let inbattle0
 
 
 to setup-desert
@@ -485,9 +492,7 @@ to t72engage
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
           [
             ;; since we've hit let's see if armor is on
-            ifelse m1a1_armor = 0
-            [set p_k_t72 (0.99 - 0.00018 * targetrangem1a1)]
-            [set p_k_t72 (0.89 - 0.00028 * targetrangem1a1)]
+            set p_k_t72 1 / (1 + exp( (targetrangem1a1 / (1050 -(554.53 * m1a1-upgraded-armor))) - (2.5237 - (.5280 * m1a1-upgraded-armor))))
             let t72_shot_kill random-float 1 ;;have a randomly distributed uniform [0,1].
             if t72_shot_kill <= p_k_t72
             [
@@ -694,7 +699,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-34
+20
 1
 1
 NIL
@@ -714,17 +719,6 @@ max-pycor
 1
 NIL
 HORIZONTAL
-
-SWITCH
-19
-576
-197
-609
-M1A1_Thermal_Sights
-M1A1_Thermal_Sights
-0
-1
--1000
 
 SWITCH
 19
@@ -804,16 +798,6 @@ TEXTBOX
 170
 791
 T-72 Setup
-11
-0.0
-1
-
-TEXTBOX
-21
-561
-171
-579
-M1A1 Setup
 11
 0.0
 1
@@ -945,7 +929,7 @@ SWITCH
 374
 extra-t72s
 extra-t72s
-1
+0
 1
 -1000
 
@@ -956,7 +940,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-1
+0
 1
 -1000
 
@@ -969,7 +953,7 @@ extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-35
+22
 1
 1
 NIL
@@ -1059,17 +1043,6 @@ m1a1-fcs
 1
 -1000
 
-SWITCH
-16
-614
-196
-647
-m1a1-upgraded-armor
-m1a1-upgraded-armor
-0
-1
--1000
-
 SLIDER
 365
 772
@@ -1086,10 +1059,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-529
-421
-684
-481
+262
+349
+417
+409
 number_of_iterations
 763
 1
@@ -1097,10 +1070,10 @@ number_of_iterations
 Number
 
 BUTTON
-351
-275
-422
-308
+338
+313
+409
+346
 Profiler
 setup                  ;; set up the model\nprofiler:start         ;; start profiling\nrepeat 500 [ go ]       ;; run something you want to measure\nprofiler:stop          ;; stop profiling\nprint profiler:report  ;; view the results\nprofiler:reset         ;; clear the data
 NIL
@@ -1112,6 +1085,51 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+235
+140
+407
+173
+M1A1_Thermal_Sights
+M1A1_Thermal_Sights
+0
+1
+0.5
+0.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+255
+204
+429
+237
+m1a1-upgraded-armor
+m1a1-upgraded-armor
+0
+1
+0.5
+.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+239
+282
+411
+315
+m1a1gps
+m1a1gps
+0
+1
+0.5
+0.000001
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
