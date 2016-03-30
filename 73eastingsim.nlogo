@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range  T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -247,6 +247,21 @@ to setup-desert
   ]
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
   show ridgeline_x_cor
+
+  ;;setup our t72 sights...
+    set t72max_engagement_range 0
+  set t72thermal 0
+    ifelse desert-visibility < 800
+    [
+     set t72thermal 1
+     set t72max_engagement_range 800
+    ]
+    [
+     set t72thermal 0
+     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
+    ]
+    set t72max_engagement_range t72max_engagement_range * scale_factor_x
+    show t72max_engagement_range
 end
 
 
@@ -307,6 +322,7 @@ to move
     fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
     set fired fired - 1 ;;go ahead and decrement the 'fired' variable
     ;show ridgeline_x_cor
+    ;show pxcor
     if pxcor >= ridgeline_x_cor
      [
      set crest 1 ;; set our crest variable if they've gone over the hill
@@ -374,15 +390,6 @@ to detect
   end
 
 to t72detect
-   let t72max_engagement_range 0
-  let localt72thermal 0
-    ifelse desert-visibility < 800
-    [set localt72thermal 1
-     set t72max_engagement_range 800
-    ]
-    [set localt72thermal 0
-     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
-    ]
   let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
   ;;show direction_of_view
@@ -404,7 +411,7 @@ to t72detect
      if direction_of_view - 5 < target_direction and direction_of_view + 5 > target_direction
      [
        let range (distance myself) / scale_factor_x
-       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * localt72thermal)) - (1.75 + (.5475 * localt72thermal)))))
+       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * t72thermal)) - (1.75 + (.5475 * t72thermal)))))
      ]
   ]
      set random_detect random-float 1
@@ -468,7 +475,7 @@ to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
-  let t72max_engagement_range t72thermal_sights_range / scale_factor_x ;; set the farthest away patch the M1A1s can engage
+   ;; set the farthest away patch the M1A1s can engage
   let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
   if m1a1targets != nobody
   [
@@ -655,7 +662,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-200
+13
 1
 1
 t72
@@ -751,7 +758,7 @@ Desert_Length_In_Meters
 Desert_Length_In_Meters
 100
 100000
-10000
+3402
 1
 1
 meters
@@ -766,7 +773,7 @@ Desert_Height_In_Meters
 Desert_Height_In_Meters
 100
 100000
-10000
+3014
 1
 1
 meters
@@ -906,7 +913,7 @@ desert-visibility
 desert-visibility
 0
 20000
-3135
+5202
 1
 1
 meters
@@ -1104,7 +1111,7 @@ m1a1gps
 m1a1gps
 0
 1
-0
+1
 0.000001
 1
 NIL
@@ -1119,7 +1126,7 @@ m1a1-main-gun
 m1a1-main-gun
 0
 1
-1.0E-5
+2.1E-5
 0.000001
 1
 NIL
