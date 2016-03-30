@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun ridgeline_x_cor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -48,7 +48,7 @@ to reset
   set M1A1_Thermal_Sights true
   ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
-  set M1A1_GPS 1
+  set M1A1_GPS true
   set m1a1-formation "Line"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
@@ -59,7 +59,7 @@ to reset
   set t72-spacing 10
   set Desert_Length_In_Meters 10000
   set Desert_Height_In_Meters 10000
-  set ridgeline_x_cor 0
+  ;set ridgeline_x_cor 0
   set desert-visibility 50
   end
 
@@ -229,15 +229,17 @@ to setup-desert
   ;;in this function we're going to setup and normalize the desert
   set scale_factor_x max-pxcor / Desert_Length_In_Meters  ;; this will give us a fraction so we can work with xycor easier
   set scale_factor_y max-pycor / Desert_Height_In_Meters  ;;this will give us a fraction so we can work with xycor easier
+  set ridgeline_x_cor ( lead_t72_x_cor ) - ( 1420 * scale_factor_x )
   let desert-setup min-pycor ;; dynamically allocate our min-pycor...
   let random_num 0 ;;initialize
   while [(desert-setup + random_num) <= max-pycor] ;;while our index (desert-setup) plus our random numeber (random_num) are within the bounds of the map...
   [
-  ask patch ( (ridgeline_x_cor - 2) + random 3) (desert-setup + random_num) [set pcolor ( 36 + random-float 3) ];(max-pycor - desert-setup) [set pcolor 37] ;; set the random patch to be a random color based around the 'sand' color
+  ask patch ( ( ridgeline_x_cor - 2) + random 3) (desert-setup + random_num) [set pcolor ( 36 + random-float 3) ];(max-pycor - desert-setup) [set pcolor 37] ;; set the random patch to be a random color based around the 'sand' color
   set desert-setup desert-setup + 1 ;; increment our index
   set random_num (random 2 + random -2)
   ]
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
+  ;show ridgeline_x_cor
 end
 
 
@@ -260,11 +262,13 @@ to go
   ;;sanity check and make sure somehow our tanks didn't all destroy each other
   if not any? t72s
   [
-    easting_report
+    ;easting_report
+    stop
    ]
   if not any? m1a1s
   [
-    easting_report
+    ;easting_report
+    stop
   ]
   drift
   ask m1a1s
@@ -309,7 +313,7 @@ to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
   ;show "entering detect"
   ifelse crest != 1
-  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor )] ;;find any T-72s in visual range, changed to include ridge...)
+  [set t72targets t72s in-radius abs ( ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ) ] ;;find any T-72s in visual range, changed to include ridge...)
   [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ))] ;;find any T-72s in visual range AFTER the ridge...)
   let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
@@ -499,22 +503,22 @@ to t72engage
   ]
 end
 
-to easting_report
-  ask m1a1s
-  [file-print hp]
-  file-print "Hello World"
-  file-close;"results.txt"
-  ;export-plot "Number Of Tanks" "plot.csv"
-  set number_of_iterations number_of_iterations - 1
-  ifelse number_of_iterations > 0
-  [
-  setup
-  go
-  ]
-  [
-    stop
-  ]
-end
+;to easting_report
+;  ask m1a1s
+;  [file-print hp]
+;  file-print "Hello World"
+;  file-close;"results.txt"
+;  export-plot "Number Of Tanks" "plot.csv"
+;  set number_of_iterations number_of_iterations - 1
+;  ifelse number_of_iterations > 0
+;  [
+;  setup
+;  go
+;  ]
+;  [
+;    stop
+;  ]
+;end
 
 ;to death  ;; turtle procedure
 ;  ;;when energy dips below zero, die
@@ -551,10 +555,10 @@ end
 ;;end
 @#$#@#$#@
 GRAPHICS-WINDOW
-601
-10
-1421
-651
+441
+22
+1261
+663
 40
 30
 10.0
@@ -690,7 +694,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-20
+34
 1
 1
 NIL
@@ -763,7 +767,7 @@ Desert_Length_In_Meters
 Desert_Length_In_Meters
 100
 100000
-1751
+10000
 1
 1
 meters
@@ -778,7 +782,7 @@ Desert_Height_In_Meters
 Desert_Height_In_Meters
 100
 100000
-1765
+10000
 1
 1
 meters
@@ -858,21 +862,6 @@ max-pxcor / scale_factor_x
 1
 11
 
-SLIDER
-16
-1084
-188
-1117
-ridgeline_x_cor
-ridgeline_x_cor
-min-pxcor
-max-pxcor
-0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
 279
 688
@@ -918,7 +907,7 @@ m1a1-spacing
 m1a1-spacing
 0
 100
-38
+10
 1
 1
 NIL
@@ -980,7 +969,7 @@ extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-22
+35
 1
 1
 NIL
@@ -1055,7 +1044,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-0
+1
 1
 -1000
 
@@ -1102,7 +1091,7 @@ INPUTBOX
 684
 481
 number_of_iterations
-770
+763
 1
 0
 Number
