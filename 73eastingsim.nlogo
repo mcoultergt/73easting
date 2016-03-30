@@ -305,8 +305,8 @@ to go
     t72engage
   ]
   tick
-  ask t72s [if hp <= 0 [ die ]]
-  ask m1a1s [if hp <= 0 [ die ]]
+  ;ask t72s [if hp <= 0 [ die ]]
+  ;ask m1a1s [if hp <= 0 [ die ]]
   clear-links ;; reset links so we can see missed shots (if we're looking...)
 end
 
@@ -426,6 +426,8 @@ to m1a1engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
   ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
+  ;;check to make sure our tanks can shoot...
+  if hp <= 0 [ die ]
   let m1pkrand 0
   if t72target != 0
   [
@@ -474,6 +476,7 @@ end
 to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
+  if hp <= 0 [ die ]
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
    ;; set the farthest away patch the M1A1s can engage
   let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
@@ -915,7 +918,7 @@ SWITCH
 374
 extra-t72s
 extra-t72s
-0
+1
 1
 -1000
 
@@ -926,7 +929,7 @@ SWITCH
 483
 coil-t72s
 coil-t72s
-0
+1
 1
 -1000
 
@@ -1135,6 +1138,25 @@ M1A1Turret_stab
 1
 NIL
 HORIZONTAL
+
+PLOT
+412
+362
+612
+512
+# Of Tanks
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -2674135 true "" "plot count t72s"
+"pen-1" 1.0 0 -13345367 true "" "plot count m1a1s"
 
 @#$#@#$#@
 ## WHAT IS IT?
