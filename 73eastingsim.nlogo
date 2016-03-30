@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range  T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun ridgeline_x_cor]  ;; Assume sand is flat after a point...
+globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range  T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -36,7 +36,7 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  set m1a1-main-gun 1
+  ;set m1a1-main-gun 1
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
@@ -48,7 +48,7 @@ to reset
   set M1A1_Thermal_Sights 1
   ;set M1A1_Thermal_Sights_Range 2000
   set M1A1_Turret_Stablization true
-  set M1A1_GPS true
+  ;set M1A1_GPS true
   set m1a1-formation "Line"
   set m1a1-spacing 10
   set T72_Thermal_Sights false
@@ -246,7 +246,7 @@ to setup-desert
   set random_num (random 2 + random -2)
   ]
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
-  ;show ridgeline_x_cor
+  show ridgeline_x_cor
 end
 
 
@@ -306,6 +306,7 @@ to move
     set heading driftdegree
     fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
     set fired fired - 1 ;;go ahead and decrement the 'fired' variable
+    ;show ridgeline_x_cor
     if pxcor >= ridgeline_x_cor
      [
      set crest 1 ;; set our crest variable if they've gone over the hill
@@ -639,7 +640,7 @@ initial-number-m1a1
 initial-number-m1a1
 0
 200
-9
+11
 1
 1
 m1a1
@@ -654,7 +655,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-8
+200
 1
 1
 t72
@@ -727,17 +728,6 @@ SWITCH
 687
 M1A1_Turret_Stablization
 M1A1_Turret_Stablization
-0
-1
--1000
-
-SWITCH
-18
-691
-134
-724
-M1A1_GPS
-M1A1_GPS
 0
 1
 -1000
@@ -908,15 +898,15 @@ m1a1-formation
 0
 
 SLIDER
-15
-1122
-203
-1155
+10
+571
+198
+604
 desert-visibility
 desert-visibility
 0
 20000
-50
+3135
 1
 1
 meters
@@ -1028,31 +1018,20 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-1
-1
--1000
-
-SWITCH
-194
-736
-300
-769
-m1a1-fcs
-m1a1-fcs
 0
 1
 -1000
 
 SLIDER
-365
-772
-537
-805
+242
+246
+414
+279
 M1A1_fcs
 M1A1_fcs
 0
 1
-1
+0
 0.0001
 1
 NIL
@@ -1087,15 +1066,15 @@ NIL
 1
 
 SLIDER
-235
-140
-407
-173
+250
+111
+422
+144
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-0.5
+0
 0.000001
 1
 NIL
@@ -1110,7 +1089,7 @@ m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-0.5
+1
 .000001
 1
 NIL
@@ -1125,7 +1104,22 @@ m1a1gps
 m1a1gps
 0
 1
-0.5
+0
+0.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+205
+165
+377
+198
+m1a1-main-gun
+m1a1-main-gun
+0
+1
+1.0E-5
 0.000001
 1
 NIL
