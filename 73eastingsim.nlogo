@@ -18,6 +18,8 @@ t72s-own [hp fired time_since_shot shot_at]    ;; both t72s and m1a1s have hit p
 
 to setup
   clear-all
+  file-close
+  ;file-delete "results.txt"
   file-open "results.txt"
   ask patches [ set pcolor brown ] ;;goahead and set the initial desert color to sand...
   setup-m1a1s   ;; create the m1a1s, then initialize their variables
@@ -1100,7 +1102,7 @@ INPUTBOX
 684
 481
 number_of_iterations
-833
+770
 1
 0
 Number
