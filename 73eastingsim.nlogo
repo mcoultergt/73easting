@@ -427,7 +427,7 @@ to m1a1engage
   ;; convert our patches into distance...
   ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
   ;;check to make sure our tanks can shoot...
-  if hp <= 0 [ die ]
+  if hp <= 0 [die stop ]
   let m1pkrand 0
   if t72target != 0
   [
@@ -476,7 +476,7 @@ end
 to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
-  if hp <= 0 [ die ]
+  if hp <= 0 [ die stop ]
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
    ;; set the farthest away patch the M1A1s can engage
   let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
@@ -650,7 +650,7 @@ initial-number-m1a1
 initial-number-m1a1
 0
 200
-9
+11
 1
 1
 m1a1
@@ -665,7 +665,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-8
+13
 1
 1
 t72
@@ -905,7 +905,7 @@ desert-visibility
 desert-visibility
 0
 4000
-2007
+405
 1
 1
 meters
