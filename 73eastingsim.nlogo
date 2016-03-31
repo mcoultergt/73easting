@@ -712,8 +712,8 @@ SLIDER
 Desert_Square_Kilometers
 Desert_Square_Kilometers
 0
-10000
-221
+200
+7
 1
 1
 km^2
@@ -745,7 +745,7 @@ MONITOR
 434
 535
 Minimum Y Value in Meters
-min-pycor * scale_factor_y
+min-pycor / scale_factor_y
 17
 1
 11
@@ -853,7 +853,7 @@ desert-visibility
 desert-visibility
 0
 4000
-1896
+4000
 1
 1
 meters
@@ -967,7 +967,7 @@ M1A1_fcs
 M1A1_fcs
 0
 1
-0.4268
+1
 0.0001
 1
 NIL
@@ -1010,7 +1010,7 @@ M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-0.477719
+1
 0.000001
 1
 NIL
@@ -1025,7 +1025,7 @@ m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-0.389949
+1
 .000001
 1
 NIL
@@ -1040,7 +1040,7 @@ m1a1gps
 m1a1gps
 0
 1
-0.420382
+1
 0.000001
 1
 NIL
@@ -1055,7 +1055,7 @@ m1a1-main-gun
 m1a1-main-gun
 0
 1
-0.464992
+1
 0.000001
 1
 NIL
@@ -1070,7 +1070,7 @@ M1A1Turret_stab
 M1A1Turret_stab
 0
 1
-0.496804
+1
 0.000001
 1
 NIL
@@ -1181,7 +1181,7 @@ US_Training
 US_Training
 0
 1
-0.43
+1
 .01
 1
  Above Standard
