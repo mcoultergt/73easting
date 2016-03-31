@@ -45,21 +45,10 @@ to reset
   set coil-t72s true
   set coil_middle_t72_x_cor 35
   set coil_middle_t72_y_cor 10
-  ;set M1A1_Thermal_Sights 1
-  ;set M1A1_Thermal_Sights_Range 2000
-  ;set M1A1_Turret_Stablization true
-  ;set M1A1_GPS true
   set m1a1-formation "Line"
   set m1a1-spacing 10
-  ;set T72_Thermal_Sights false
-  ;set T72_Thermal_Sights_Range 1300
-  ;set T72_Turret_Stablization false
-  ;set T72_GPS false
   set t72-formation "Line"
   set t72-spacing 10
-  ;set Desert_Square_Meters 10000
-  ;set Desert_Height_In_Meters 10000
-  ;set ridgeline_x_cor 0
   set desert-visibility 50
   end
 
@@ -109,11 +98,6 @@ to setup-m1a1s
     set current-m1a1s current-m1a1s - 1
   ]
   set t72targets 0
-  ;;if we have an even number of M1A1s we need to make the line accordingly.
-  ;let initial-number-m1a1-mod initial-number-m1a1 - 1
-  ;if initial-number-m1a1 mod 2 = 0 [ask m1a1 initial-number-m1a1-mod [die] ] ;; mod 2
-  ;;create the LEAD m1a1
-  ;create-m1a1s 1 [set color sky set size 5 setxy lead_m1a1_x_cor lead_m1a1_y_cor set heading 90 set hp 1]
 end
 
 to setup-t72s
@@ -187,7 +171,6 @@ to setup-move
   ;; from open source documentation, the top speed (off road) of a M1A1 is 48km/h.
   ;; and since we know our scale factors, we can get that each M1A1 should move 48e-3 * scale_factor per tick...we'll use scale factor X just to be simple.
   set m1a1_move_speed 48000 / 3600 * scale_factor_x ;; M1A1 speed is 48kmh ==> 48000m/h ==> 48000m/3600s  get our move speed in m/s (will be 13.3m/s)
-  ;show scale_factor_x
 end
 
 ;to drift
@@ -215,7 +198,7 @@ to setup-desert
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
   show ridgeline_x_cor
 
-  ;;setup our t72 sights...
+  ;;setup our t72 sights... based on weather...
 
     ifelse desert-visibility < 800
     [
@@ -407,7 +390,7 @@ to m1a1engage
         set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
-        if targetrange < (desert-visibility ) ;;since we just put our target range into meters let's check it against our desert visibility...
+        if targetrange < ( m1a1-desert-visibility ) ;;since we just put our target range into meters let's check it against our desert visibility...
         [
         set m1a1hitrate (1 / (1 + (exp ((targetrange / (475.2 + (M1A1_fcs * 235.2))) - (3.31 + (0.438 * M1A1_fcs))))))
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
@@ -448,7 +431,7 @@ to t72engage
     if m1a1target != nobody
       [
       let targetrangem1a1 [distance myself] of m1a1target / scale_factor_x ;;put this value into meters
-      if targetrangem1a1 < 2500 ;;this is kind of the max value the M1A1 can shoot at...
+      if targetrangem1a1 < 2500 ;;this is kind of the max value the t72 can shoot at...
       [
       let shoot false ;;reset the check
       if m1a1target != nobody [ set shoot true ] ;;if there's somebody in range
@@ -852,7 +835,7 @@ desert-visibility
 desert-visibility
 0
 4000
-4000
+486
 1
 1
 meters
