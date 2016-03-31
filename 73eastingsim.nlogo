@@ -447,10 +447,9 @@ to t72engage
   [
     if m1a1target != nobody
       [
-      let targetrangem1a1 [distance myself] of m1a1target / scale_factor_x
-      if targetrangem1a1 < 2500
+      let targetrangem1a1 [distance myself] of m1a1target / scale_factor_x ;;put this value into meters
+      if targetrangem1a1 < 2500 ;;this is kind of the max value the M1A1 can shoot at...
       [
-      ;if target xcor >= ridgeline_x_cor
       let shoot false ;;reset the check
       if m1a1target != nobody [ set shoot true ] ;;if there's somebody in range
       if (shoot = true)
