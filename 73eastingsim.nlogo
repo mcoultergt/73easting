@@ -199,7 +199,7 @@ to setup-desert
   ;;figure out our sides based on our desert area...
   let Desert_Square_Meters Desert_Square_Kilometers * 1000000
   set Desert_Length_In_Meters ( sqrt (Desert_Square_Meters))
-  show Desert_Length_In_Meters
+  ;show Desert_Length_In_Meters
   set Desert_Height_In_Meters ( sqrt (Desert_Square_Meters) )
   set scale_factor_x max-pxcor / Desert_Length_In_Meters  ;; this will give us a fraction so we can work with xycor easier
   set scale_factor_y max-pycor / Desert_Height_In_Meters  ;;this will give us a fraction so we can work with xycor easier
@@ -391,7 +391,6 @@ to t72detect
 to m1a1engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
-  ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
   ;;check to make sure our tanks can shoot...
   if hp <= 0 [die stop ]
   let m1pkrand 0
@@ -407,8 +406,8 @@ to m1a1engage
         create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
         set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
-        set targetrange [distance myself] of t72target / scale_factor_x
-        if targetrange < (desert-visibility * scale_factor_x)
+        set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
+        if targetrange < (desert-visibility ) ;;since we just put our target range into meters let's check it against our desert visibility...
         [
         set m1a1hitrate (1 / (1 + (exp ((targetrange / (475.2 + (M1A1_fcs * 235.2))) - (3.31 + (0.438 * M1A1_fcs))))))
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
@@ -714,7 +713,7 @@ Desert_Square_Kilometers
 Desert_Square_Kilometers
 0
 10000
-17
+221
 1
 1
 km^2
@@ -854,7 +853,7 @@ desert-visibility
 desert-visibility
 0
 4000
-4000
+1896
 1
 1
 meters
