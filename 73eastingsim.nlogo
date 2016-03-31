@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor]  ;; Assume sand is flat after a point...
+globals [sand driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor Desert_Length_In_Meters Desert_Height_In_Meters]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -51,14 +51,14 @@ to reset
   ;set M1A1_GPS true
   set m1a1-formation "Line"
   set m1a1-spacing 10
-  set T72_Thermal_Sights false
+  ;set T72_Thermal_Sights false
   ;set T72_Thermal_Sights_Range 1300
   ;set T72_Turret_Stablization false
   ;set T72_GPS false
   set t72-formation "Line"
   set t72-spacing 10
-  set Desert_Length_In_Meters 10000
-  set Desert_Height_In_Meters 10000
+  ;set Desert_Square_Meters 10000
+  ;set Desert_Height_In_Meters 10000
   ;set ridgeline_x_cor 0
   set desert-visibility 50
   end
@@ -177,48 +177,10 @@ to setup-t72s
       set size 5
       set hp 1
       ]
-      ;layout-circle t72s 10 ;setxy coil_middle_t72_x_cor coil_middle_t72_y_cor set hp 1 ;;hardcode 17 for right now, we can bring this out later if we need.
   ]
 end
 
 to setup-technology
-  ;ifelse M1A1_Turret_Stablization = True
-  ;     [set M1A1turret_stab 1]
-  ;     [set M1A1turret_stab 0]
-
-;;;<<<<<<< HEAD
-;  ;;take the booleans and convert into 0 or 1...
-		;ifelse M1A1_Turret_Stablization = True
-       ;[set M1A1turret_stab 1]
-       ;[set M1A1turret_stab 0]
-      ;ifelse M1A1_Thermal_Sights = True
-      ; [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-      ; [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
-      ;ifelse M1A1_GPS = True
-      ; [set M1A1gps 1]
-      ; [set M1A1gps 0]
-      ;ifelse m1a1-fcs
-      ; [set M1A1_fcs 1]
-      ; [set M1A1_fcs 0]
-
-      ; ifelse m1a1-upgraded-armor = True
-      ; [set m1a1_armor 1]
-      ; [set m1a1_armor 0]
-     ; ifelse T72_Turret_Stablization = True
-     ;  [set T72turret_stab 1]
-     ;  [set T72turret_stab 0]
-     ; ifelse T72_Thermal_Sights = True
-     ;  [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
-     ;  [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
-     ; ifelse T72_GPS = True
-     ;  [set T72gps 1]
-     ; [set T72gps 0]
-  ;;second iteration hit rate
-  ;set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
-  ;set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
-  ;;in here we'll setup up our technology variables
-  ;; note for all this the point of the model isn't to see if the technology should be IMPROVED at all, it's to see if a
-  ;; tangible difference exists for having the technology in the first place.
 end
 
 to setup-move
@@ -234,6 +196,11 @@ end
 
 to setup-desert
   ;;in this function we're going to setup and normalize the desert
+  ;;figure out our sides based on our desert area...
+  let Desert_Square_Meters Desert_Square_Kilometers * 1000000
+  set Desert_Length_In_Meters ( sqrt (Desert_Square_Meters))
+  show Desert_Length_In_Meters
+  set Desert_Height_In_Meters ( sqrt (Desert_Square_Meters) )
   set scale_factor_x max-pxcor / Desert_Length_In_Meters  ;; this will give us a fraction so we can work with xycor easier
   set scale_factor_y max-pycor / Desert_Height_In_Meters  ;;this will give us a fraction so we can work with xycor easier
   set ridgeline_x_cor ( lead_t72_x_cor ) - ( 1420 * scale_factor_x )
@@ -249,8 +216,7 @@ to setup-desert
   show ridgeline_x_cor
 
   ;;setup our t72 sights...
-    set t72max_engagement_range 0
-  set t72thermal 0
+
     ifelse desert-visibility < 800
     [
      set t72thermal 1
@@ -373,7 +339,7 @@ to detect
        ;;need to fix this before final commit!
        ;write "tau ="
        ;show tau
-       ifelse M1A1thermal_sights = 1
+       ifelse M1A1_Thermal_sights = 1
        [ set p_detection 0.99
          ;show "set thermal sights"
          ]
@@ -391,16 +357,7 @@ to detect
   end
 
 to t72detect
-  set t72max_engagement_range 0
-  let localt72thermal 0
-    ifelse desert-visibility < 800
-    [set localt72thermal 1
-     set t72max_engagement_range 800
-    ]
-    [set localt72thermal 0
-     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
-    ]
-  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
+  let m1a1targets m1a1s in-radius (t72max_engagement_range) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
@@ -420,7 +377,7 @@ to t72detect
      if direction_of_view - 5 < t72_target_direction and direction_of_view + 5 > t72_target_direction
      [
        let range (distance myself) / scale_factor_x
-       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * localt72thermal)) - (1.75 + (.5475 * localt72thermal)))))
+       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * t72thermal)) - (1.75 + (.5475 * t72thermal)))))
      ]
      set random_detect random-float 1
      if random_detect <= p_detectioniraqi
@@ -451,7 +408,7 @@ to m1a1engage
         set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         set targetrange [distance myself] of t72target / scale_factor_x
-        if targetrange < 3500
+        if targetrange < (desert-visibility * scale_factor_x)
         [
         set m1a1hitrate (1 / (1 + (exp ((targetrange / (475.2 + (M1A1_fcs * 235.2))) - (3.31 + (0.438 * M1A1_fcs))))))
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
@@ -581,9 +538,9 @@ GRAPHICS-WINDOW
 441
 22
 1261
-663
+863
 40
-30
+40
 10.0
 1
 14
@@ -596,8 +553,8 @@ GRAPHICS-WINDOW
 1
 -40
 40
--30
-30
+-40
+40
 0
 0
 1
@@ -672,7 +629,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-18
+13
 1
 1
 t72
@@ -749,50 +706,35 @@ Computed Values from Simulation
 1
 
 SLIDER
-16
-1011
-273
-1044
-Desert_Length_In_Meters
-Desert_Length_In_Meters
-100
-100000
-2990
+9
+862
+296
+895
+Desert_Square_Kilometers
+Desert_Square_Kilometers
+0
+10000
+17
 1
 1
-meters
-HORIZONTAL
-
-SLIDER
-16
-1046
-271
-1079
-Desert_Height_In_Meters
-Desert_Height_In_Meters
-100
-100000
-3430
-1
-1
-meters
+km^2
 HORIZONTAL
 
 TEXTBOX
-20
-992
-170
-1010
+13
+843
+163
+861
 Desert Setup
 11
 0.0
 1
 
 TEXTBOX
-20
-773
-170
-791
+11
+737
+161
+755
 T-72 Setup
 11
 0.0
@@ -804,7 +746,7 @@ MONITOR
 434
 535
 Minimum Y Value in Meters
-min-pycor / scale_factor_y
+min-pycor * scale_factor_y
 17
 1
 11
@@ -854,20 +796,20 @@ ridgeline_x_meter
 11
 
 CHOOSER
-123
-906
-261
-951
+8
+754
+146
+799
 t72-formation
 t72-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
-16
-955
-188
-988
+9
+806
+181
+839
 t72-spacing
 t72-spacing
 0
@@ -879,10 +821,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-735
-189
-768
+9
+697
+181
+730
 m1a1-spacing
 m1a1-spacing
 0
@@ -894,14 +836,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-137
-689
-275
-734
+9
+649
+147
+694
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
-2
+0
 
 SLIDER
 10
@@ -912,7 +854,7 @@ desert-visibility
 desert-visibility
 0
 4000
-1133
+4000
 1
 1
 meters
@@ -1017,27 +959,16 @@ NIL
 NIL
 1
 
-SWITCH
-17
-792
-184
-825
-T72_Thermal_Sights
-T72_Thermal_Sights
-0
-1
--1000
-
 SLIDER
-242
-246
-414
-279
+214
+226
+386
+259
 M1A1_fcs
 M1A1_fcs
 0
 1
-1
+0.4268
 0.0001
 1
 NIL
@@ -1072,60 +1003,60 @@ NIL
 1
 
 SLIDER
-250
-111
-422
-144
+215
+101
+387
+134
 M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-1
+0.477719
 0.000001
 1
 NIL
 HORIZONTAL
 
 SLIDER
-255
-204
-429
-237
+215
+186
+389
+219
 m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-1
+0.389949
 .000001
 1
 NIL
 HORIZONTAL
 
 SLIDER
-239
-282
-411
-315
+215
+266
+387
+299
 m1a1gps
 m1a1gps
 0
 1
-1
+0.420382
 0.000001
 1
 NIL
 HORIZONTAL
 
 SLIDER
-205
-165
-377
-198
+215
+143
+387
+176
 m1a1-main-gun
 m1a1-main-gun
 0
 1
-1
+0.464992
 0.000001
 1
 NIL
@@ -1140,7 +1071,7 @@ M1A1Turret_stab
 M1A1Turret_stab
 0
 1
-1
+0.496804
 0.000001
 1
 NIL
@@ -1251,10 +1182,10 @@ US_Training
 US_Training
 0
 1
-1
+0.43
 .01
 1
-Percent Above Standard
+ Above Standard
 HORIZONTAL
 
 @#$#@#$#@
