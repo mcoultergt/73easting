@@ -199,7 +199,6 @@ to setup-desert
   show ridgeline_x_cor
 
   ;;setup our t72 sights... based on weather...
-
     ifelse desert-visibility < 800
     [
      set t72thermal 1
@@ -210,7 +209,7 @@ to setup-desert
      set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
     ]
     set t72max_engagement_range t72max_engagement_range * scale_factor_x
-    show t72max_engagement_range
+        show t72max_engagement_range
 end
 
 
@@ -390,7 +389,7 @@ to m1a1engage
         set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
-        if targetrange < ( m1a1-desert-visibility ) ;;since we just put our target range into meters let's check it against our desert visibility...
+        if targetrange < ( 3500 ) ;;since we just put our target range into meters let's check it against our desert visibility...
         [
         set m1a1hitrate (1 / (1 + (exp ((targetrange / (475.2 + (M1A1_fcs * 235.2))) - (3.31 + (0.438 * M1A1_fcs))))))
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
