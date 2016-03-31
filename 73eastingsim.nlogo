@@ -302,6 +302,7 @@ to go
   ask t72s
   [
     ;;based on historical data the Iraqi Republican Guard tanks didn't move during the battle.
+    t72detect
     t72engage
   ]
   tick
@@ -376,7 +377,7 @@ to detect
        [ set p_detection 0.99
          ;show "set thermal sights"
          ]
-       [ set p_detection (1 / ( 1 + exp (( range / (1154 + ( 11788.68 * M1A1_Thermal_Sights ) )  - ( 1.75 + (8.259 * M1A1_Thermal_Sights))))))]
+       [ set p_detection (1 - (1 / 3 * (1 - US_Training))) * (1 / ( 1 + exp (( range / (1154 + ( 11788.68 * M1A1_Thermal_Sights ) )  - ( 1.75 + (8.259 * M1A1_Thermal_Sights))))))]
        set random_detect random-float 1
        if random_detect <= p_detection
        [
@@ -390,9 +391,17 @@ to detect
   end
 
 to t72detect
-  let m1a1targets m1a1s in-radius (t72max_engagement_range) ;;find any Abrams Tanks in our max engagement range
+  set t72max_engagement_range 0
+  let localt72thermal 0
+    ifelse desert-visibility < 800
+    [set localt72thermal 1
+     set t72max_engagement_range 800
+    ]
+    [set localt72thermal 0
+     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
+    ]
+  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
-  ;;show direction_of_view
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
   let target_x_pos 0
@@ -408,17 +417,17 @@ to t72detect
    set delta_x target_x_pos - tank_x_pos
    set delta_y target_y_pos - tank_y_pos
    set t72_target_direction atan delta_x delta_y
-     if direction_of_view - 5 < target_direction and direction_of_view + 5 > target_direction
+     if direction_of_view - 5 < t72_target_direction and direction_of_view + 5 > t72_target_direction
      [
        let range (distance myself) / scale_factor_x
-       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * t72thermal)) - (1.75 + (.5475 * t72thermal)))))
+       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * localt72thermal)) - (1.75 + (.5475 * localt72thermal)))))
      ]
-  ]
      set random_detect random-float 1
      if random_detect <= p_detectioniraqi
        [
        set m1a1target self
        ]
+    ]
   end
 
 
@@ -454,7 +463,7 @@ to m1a1engage
               set m1pkrand random-float 1
               if m1pkrand < m1a1p_kill
                [
-                 ask t72target [set hp hp - m1a1p_kill set label "Killed!"] ;; And destoy the target tank if we're <= that probability for heat round
+                 ask t72target [set hp hp - 1 show hp set label "Killed!"] ;; And destoy the target tank if we're <= that probability for heat round
                ]
 
           ]
@@ -476,28 +485,25 @@ end
 to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
-  if hp <= 0 [ die stop ]
+  if hp <= 0 [die stop ]
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
-   ;; set the farthest away patch the M1A1s can engage
-  let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
-  if m1a1targets != nobody
+  if m1a1target != 0
   [
-    let target min-one-of m1a1targets [distance myself] ;; engage the closest M1A1
-      if target != nobody
+    if m1a1target != nobody
       [
-    let targetrangem1a1 [distance myself] of target / scale_factor_x
-
-    ;if target xcor >= ridgeline_x_cor
-    let shoot false ;;reset the check
-    if target != nobody [ set shoot true ] ;;if there's somebody in range
-    ;;let targetrange distance target * scale_factor_x
-    if (shoot = true)
-    [
-      if [crest] of target = 1 ;; if the target is over the ridge
+      let targetrangem1a1 [distance myself] of m1a1target / scale_factor_x
+      if targetrangem1a1 < 2500
+      [
+      ;if target xcor >= ridgeline_x_cor
+      let shoot false ;;reset the check
+      if m1a1target != nobody [ set shoot true ] ;;if there's somebody in range
+      if (shoot = true)
+      [
+      if [crest] of m1a1target = 1 ;; if the target is over the ridge
       [
         if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
         [
-          create-link-to target [set color red] ;;create a red link to M1A1s
+          create-link-to m1a1target [set color red] ;;create a red link to M1A1s
           set t72hitrate (1 / ( 1 + exp ( (targetrangem1a1 / 643.5) - 2.97)))
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
@@ -507,17 +513,18 @@ to t72engage
             let t72_shot_kill random-float 1 ;;have a randomly distributed uniform [0,1].
             if t72_shot_kill <= p_k_t72
             [
-            ask target [set hp hp - 1]
+            ask m1a1target [set hp hp - 1]
             ]
           ]
       set fired 3 ;;reset our fired for t72s.
-
+     ]
     ]
     ]
   ]
   ]
   ]
 end
+
 
 ;to easting_report
 ;  ask m1a1s
@@ -650,7 +657,7 @@ initial-number-m1a1
 initial-number-m1a1
 0
 200
-11
+9
 1
 1
 m1a1
@@ -665,7 +672,7 @@ initial-number-t72
 initial-number-t72
 0
 200
-13
+18
 1
 1
 t72
@@ -894,7 +901,7 @@ CHOOSER
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
-0
+2
 
 SLIDER
 10
@@ -905,7 +912,7 @@ desert-visibility
 desert-visibility
 0
 4000
-405
+1133
 1
 1
 meters
@@ -1017,7 +1024,7 @@ SWITCH
 825
 T72_Thermal_Sights
 T72_Thermal_Sights
-1
+0
 1
 -1000
 
@@ -1140,10 +1147,10 @@ NIL
 HORIZONTAL
 
 PLOT
-412
-362
-612
-512
+749
+710
+949
+860
 # Of Tanks
 NIL
 NIL
@@ -1157,6 +1164,98 @@ false
 PENS
 "default" 1.0 0 -2674135 true "" "plot count t72s"
 "pen-1" 1.0 0 -13345367 true "" "plot count m1a1s"
+
+MONITOR
+281
+785
+371
+830
+US Tank P_Hit
+m1a1hitrate
+4
+1
+11
+
+MONITOR
+549
+787
+650
+832
+Iraqi Tank P_Hit
+t72hitrate
+4
+1
+11
+
+MONITOR
+281
+833
+397
+878
+US Tank P_Kill | Hit
+m1a1p_kill
+4
+1
+11
+
+MONITOR
+548
+836
+674
+881
+Iraqi Tank P_Kill | Hit
+p_k_t72
+4
+1
+11
+
+MONITOR
+280
+737
+414
+782
+US Tanks P_Detection
+p_detection
+4
+1
+11
+
+MONITOR
+549
+739
+688
+784
+Iraqi Tank P_Detection
+p_detectioniraqi
+4
+1
+11
+
+MONITOR
+1094
+739
+1250
+784
+ Distance Between Forces
+targetrange
+4
+1
+11
+
+SLIDER
+9
+612
+264
+645
+US_Training
+US_Training
+0
+1
+1
+.01
+1
+Percent Above Standard
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
