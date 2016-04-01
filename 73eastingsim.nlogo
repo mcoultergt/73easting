@@ -654,7 +654,7 @@ lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-20
+10
 1
 1
 NIL
@@ -1525,6 +1525,88 @@ repeat 75 [ go step-aggregate ]
     org.nlogo.sdm.gui.AggregateDrawing 1
         org.nlogo.sdm.gui.ReservoirFigure "attributes" "attributes" 1 "FillColor" "Color" 192 192 192 15 105 30 30
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count m1a1s</metric>
+    <metric>count t72s</metric>
+    <enumeratedValueSet variable="m1a1-spacing">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_t72_y_cor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="m1a1-formation">
+      <value value="&quot;Line&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="m1a1-main-gun">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_m1a1_y_cor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="M1A1Turret_stab">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coil-t72s">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_t72_x_cor">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Desert_Square_Kilometers">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="t72-formation">
+      <value value="&quot;Line&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_m1a1_x_cor">
+      <value value="-20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="t72-spacing">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="m1a1gps">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="M1A1_fcs">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_iterations">
+      <value value="763"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="m1a1-upgraded-armor">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="desert-visibility">
+      <value value="486"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.01" last="1"/>
+    <enumeratedValueSet variable="extra-t72s">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="US_Training" first="0" step="0.01" last="1"/>
+    <enumeratedValueSet variable="extra_lead_t72_y_cor">
+      <value value="-8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coil_middle_t72_x_cor">
+      <value value="35"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coil_middle_t72_y_cor">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-m1a1">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extra_lead_t72_x_cor">
+      <value value="22"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-t72">
+      <value value="13"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
