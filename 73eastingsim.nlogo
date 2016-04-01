@@ -196,7 +196,7 @@ to setup-desert
   set random_num (random 2 + random -2)
   ]
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
-  show ridgeline_x_cor
+  ;show ridgeline_x_cor
 
   ;;setup our t72 sights... based on weather...
     ifelse desert-visibility < 800
@@ -209,7 +209,7 @@ to setup-desert
      set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
     ]
     set t72max_engagement_range t72max_engagement_range * scale_factor_x
-        show t72max_engagement_range
+        ;show t72max_engagement_range
 end
 
 
@@ -385,8 +385,8 @@ to m1a1engage
     [
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
-        create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
-        set label "Fire!" ;; label the M1A1 that fired as such
+        ;create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
+        ;set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
         if targetrange < ( 3500 ) ;;since we just put our target range into meters let's check it against our desert visibility...
@@ -401,11 +401,12 @@ to m1a1engage
               set m1pkrand random-float 1
               if m1pkrand < m1a1p_kill
                [
-                 ask t72target [set hp hp - 1 show hp set label "Killed!"] ;; And destoy the target tank if we're <= that probability for heat round
+                 ask t72target [set hp hp - 1] ;; And destoy the target tank if we're <= that probability for heat round
                ]
 
           ]
-          [set label "Miss!"] ;;else label the M1A1 that fired as having missed.
+          []
+          ;[set label "Miss!"] ;;else label the M1A1 that fired as having missed.
            set fired 3 ;; reset at the end of 3 move turns (set in the 'move' function) we're going to let our turtle fire again. this should 'slow down' the simulation.
            if M1A1turret_stab < 1
             [set shoot_stop 2 ;;;fire on the move
@@ -440,7 +441,7 @@ to t72engage
       [
         if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
         [
-          create-link-to m1a1target [set color red] ;;create a red link to M1A1s
+          ;create-link-to m1a1target [set color red] ;;create a red link to M1A1s
           set t72hitrate (1 / ( 1 + exp ( (targetrangem1a1 / 643.5) - 2.97)))
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
@@ -624,7 +625,7 @@ lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--20
+-15
 1
 1
 NIL
@@ -834,7 +835,7 @@ desert-visibility
 desert-visibility
 0
 4000
-486
+400
 1
 1
 meters
@@ -948,7 +949,7 @@ M1A1_fcs
 M1A1_fcs
 0
 1
-1
+0
 0.0001
 1
 NIL
@@ -991,7 +992,7 @@ M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-1
+0
 0.000001
 1
 NIL
@@ -1006,7 +1007,7 @@ m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-1
+0
 .000001
 1
 NIL
@@ -1021,7 +1022,7 @@ m1a1gps
 m1a1gps
 0
 1
-1
+0
 0.000001
 1
 NIL
@@ -1051,7 +1052,7 @@ M1A1Turret_stab
 M1A1Turret_stab
 0
 1
-1
+0
 0.000001
 1
 NIL
@@ -1162,7 +1163,7 @@ US_Training
 US_Training
 0
 1
-1
+0.6
 .01
 1
  Above Standard
@@ -1526,7 +1527,7 @@ repeat 75 [ go step-aggregate ]
         org.nlogo.sdm.gui.ReservoirFigure "attributes" "attributes" 1 "FillColor" "Color" 192 192 192 15 105 30 30
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="10" runMetricsEveryStep="false">
+  <experiment name="experiment" repetitions="20" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count m1a1s</metric>
@@ -1540,15 +1541,11 @@ repeat 75 [ go step-aggregate ]
     <enumeratedValueSet variable="m1a1-formation">
       <value value="&quot;Line&quot;"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="m1a1-main-gun">
-      <value value="1"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1-main-gun" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="lead_m1a1_y_cor">
       <value value="0"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="M1A1Turret_stab">
-      <value value="1"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="M1A1Turret_stab" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="coil-t72s">
       <value value="false"/>
     </enumeratedValueSet>
@@ -1567,26 +1564,25 @@ repeat 75 [ go step-aggregate ]
     <enumeratedValueSet variable="t72-spacing">
       <value value="10"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="m1a1gps">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="M1A1_fcs">
-      <value value="1"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1gps" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="M1A1_fcs" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="number_of_iterations">
       <value value="763"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="m1a1-upgraded-armor">
-      <value value="1"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1-upgraded-armor" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="desert-visibility">
-      <value value="486"/>
+      <value value="0"/>
+      <value value="400"/>
+      <value value="800"/>
+      <value value="1500"/>
+      <value value="3000"/>
+      <value value="4000"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.01" last="1"/>
+    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="extra-t72s">
       <value value="false"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="US_Training" first="0" step="0.01" last="1"/>
+    <steppedValueSet variable="US_Training" first="0" step="0.25" last="1"/>
     <enumeratedValueSet variable="extra_lead_t72_y_cor">
       <value value="-8"/>
     </enumeratedValueSet>
