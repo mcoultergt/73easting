@@ -625,7 +625,7 @@ lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--15
+-20
 1
 1
 NIL
@@ -835,7 +835,7 @@ desert-visibility
 desert-visibility
 0
 4000
-400
+3000
 1
 1
 meters
@@ -992,7 +992,7 @@ M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-0
+1
 0.000001
 1
 NIL
@@ -1007,7 +1007,7 @@ m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-0
+0.75
 .000001
 1
 NIL
@@ -1037,7 +1037,7 @@ m1a1-main-gun
 m1a1-main-gun
 0
 1
-1
+0
 0.000001
 1
 NIL
@@ -1163,7 +1163,7 @@ US_Training
 US_Training
 0
 1
-0.6
+0.75
 .01
 1
  Above Standard
