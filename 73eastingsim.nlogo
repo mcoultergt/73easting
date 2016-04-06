@@ -155,8 +155,8 @@ to setup-t72s
   create-ordered-t72s 17 ;; we're going to make our circle of T72s using the same parameters as the other T72s
       [
       setxy coil_middle_t72_x_cor coil_middle_t72_y_cor
-      ifelse max-pxcor - coil_middle_t72_x_cor < 10
-      [fd max-pxcor - coil_middle_t72_x_cor ][fd 10]
+      ifelse max-pxcor - coil_middle_t72_x_cor < 3
+      [fd max-pxcor - coil_middle_t72_x_cor ][ fd 3 ]
       set color red
       set size 5
       set hp 1
@@ -385,8 +385,8 @@ to m1a1engage
     [
       if fired <= 0 ;; add this catch all so our tanks can be ready to fire during this initial engagement (fired will be < 0)
       [
-        ;create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
-        ;set label "Fire!" ;; label the M1A1 that fired as such
+        create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
+        set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
         set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
         if targetrange < ( 3500 ) ;;since we just put our target range into meters let's check it against our desert visibility...
@@ -441,7 +441,7 @@ to t72engage
       [
         if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
         [
-          ;create-link-to m1a1target [set color red] ;;create a red link to M1A1s
+          create-link-to m1a1target [set color red] ;;create a red link to M1A1s
           set t72hitrate (1 / ( 1 + exp ( (targetrangem1a1 / 643.5) - 2.97)))
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
@@ -516,12 +516,12 @@ end
 ;;end
 @#$#@#$#@
 GRAPHICS-WINDOW
-441
-22
-1261
-863
-40
-40
+481
+27
+1201
+768
+35
+35
 10.0
 1
 14
@@ -532,10 +532,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--40
-40
--40
-40
+-35
+35
+-35
+35
 0
 0
 1
@@ -610,32 +610,32 @@ initial-number-t72
 initial-number-t72
 0
 200
-8
+13
 1
 1
 t72
 HORIZONTAL
 
 SLIDER
-7
-181
-179
-214
+1037
+871
+1209
+904
 lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--20
+-18
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-222
-179
-255
+394
+833
+566
+866
 lead_m1a1_y_cor
 lead_m1a1_y_cor
 min-pycor
@@ -647,25 +647,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-260
-179
-293
+576
+831
+748
+864
 lead_t72_x_cor
 lead_t72_x_cor
 min-pxcor
 max-pxcor
-20
+4
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-4
-303
-176
-336
+756
+828
+928
+861
 lead_t72_y_cor
 lead_t72_y_cor
 min-pycor
@@ -687,110 +687,35 @@ Computed Values from Simulation
 1
 
 SLIDER
-9
-862
-296
-895
+393
+872
+680
+905
 Desert_Square_Kilometers
 Desert_Square_Kilometers
 0
 200
-7
+25
 1
 1
 km^2
 HORIZONTAL
 
-TEXTBOX
-13
-843
-163
-861
-Desert Setup
-11
-0.0
-1
-
-TEXTBOX
-11
-737
-161
-755
-T-72 Setup
-11
-0.0
-1
-
-MONITOR
-277
-490
-434
-535
-Minimum Y Value in Meters
-min-pycor / scale_factor_y
-17
-1
-11
-
-MONITOR
-277
-540
-439
-585
-Maximum Y Value in Meters
-max-pycor / scale_factor_y
-17
-1
-11
-
-MONITOR
-277
-590
-434
-635
-Minimum X Value in Meters
-min-pxcor / scale_factor_x
-17
-1
-11
-
-MONITOR
-278
-639
-440
-684
-Maximum x Value in Meters
-max-pxcor / scale_factor_x
-17
-1
-11
-
-MONITOR
-279
-688
-515
-733
-Ridgeline Position (in Meters from Origin)
-ridgeline_x_meter
-17
-1
-11
-
 CHOOSER
-8
-754
-146
-799
+12
+218
+143
+263
 t72-formation
 t72-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
-9
-806
-181
-839
+685
+872
+857
+905
 t72-spacing
 t72-spacing
 0
@@ -802,10 +727,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-697
-181
-730
+863
+872
+1035
+905
 m1a1-spacing
 m1a1-spacing
 0
@@ -817,35 +742,35 @@ NIL
 HORIZONTAL
 
 CHOOSER
-9
-649
-147
-694
+214
+372
+352
+417
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
-10
-571
-198
-604
+11
+180
+199
+213
 desert-visibility
 desert-visibility
 0
 4000
-50
+400
 1
 1
 meters
 HORIZONTAL
 
 SWITCH
-7
-341
-121
-374
+934
+826
+1048
+859
 extra-t72s
 extra-t72s
 0
@@ -853,10 +778,10 @@ extra-t72s
 -1000
 
 SWITCH
-7
-450
-110
-483
+1213
+799
+1316
+832
 coil-t72s
 coil-t72s
 0
@@ -864,40 +789,40 @@ coil-t72s
 -1000
 
 SLIDER
-7
-380
-179
-413
+219
+872
+391
+905
 extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-22
+18
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-415
-180
-448
+1214
+764
+1386
+797
 extra_lead_t72_y_cor
 extra_lead_t72_y_cor
 min-pycor
 max-pycor
-7
+-5
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-484
-179
-517
+1213
+833
+1385
+866
 coil_middle_t72_x_cor
 coil_middle_t72_x_cor
 min-pxcor
@@ -909,15 +834,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-522
-180
-555
+1214
+871
+1386
+904
 coil_middle_t72_y_cor
 coil_middle_t72_y_cor
 min-pycor
 max-pycor
-21
+13
 1
 1
 NIL
@@ -955,34 +880,6 @@ M1A1_fcs
 NIL
 HORIZONTAL
 
-INPUTBOX
-262
-349
-417
-409
-number_of_iterations
-763
-1
-0
-Number
-
-BUTTON
-338
-313
-409
-346
-Profiler
-setup                  ;; set up the model\nprofiler:start         ;; start profiling\nrepeat 500 [ go ]       ;; run something you want to measure\nprofiler:stop          ;; stop profiling\nprint profiler:report  ;; view the results\nprofiler:reset         ;; clear the data
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
 215
 101
@@ -992,7 +889,7 @@ M1A1_Thermal_Sights
 M1A1_Thermal_Sights
 0
 1
-1
+0
 0.000001
 1
 NIL
@@ -1007,7 +904,7 @@ m1a1-upgraded-armor
 m1a1-upgraded-armor
 0
 1
-0.75
+0
 .000001
 1
 NIL
@@ -1044,10 +941,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-219
-421
-391
-454
+215
+300
+387
+333
 M1A1Turret_stab
 M1A1Turret_stab
 0
@@ -1059,10 +956,10 @@ NIL
 HORIZONTAL
 
 PLOT
-749
-710
-949
-860
+272
+461
+472
+611
 # Of Tanks
 NIL
 NIL
@@ -1078,10 +975,10 @@ PENS
 "pen-1" 1.0 0 -13345367 true "" "plot count m1a1s"
 
 MONITOR
-281
-785
-371
-830
+1215
+261
+1305
+306
 US Tank P_Hit
 m1a1hitrate
 4
@@ -1089,10 +986,10 @@ m1a1hitrate
 11
 
 MONITOR
-549
-787
-650
-832
+1215
+372
+1316
+417
 Iraqi Tank P_Hit
 t72hitrate
 4
@@ -1100,10 +997,10 @@ t72hitrate
 11
 
 MONITOR
-281
-833
-397
-878
+1215
+309
+1331
+354
 US Tank P_Kill | Hit
 m1a1p_kill
 4
@@ -1111,10 +1008,10 @@ m1a1p_kill
 11
 
 MONITOR
-548
-836
-674
-881
+1214
+421
+1340
+466
 Iraqi Tank P_Kill | Hit
 p_k_t72
 4
@@ -1122,10 +1019,10 @@ p_k_t72
 11
 
 MONITOR
-280
-737
-414
-782
+1214
+213
+1348
+258
 US Tanks P_Detection
 p_detection
 4
@@ -1133,10 +1030,10 @@ p_detection
 11
 
 MONITOR
-549
-739
-688
-784
+1213
+471
+1352
+516
 Iraqi Tank P_Detection
 p_detectioniraqi
 4
@@ -1144,10 +1041,10 @@ p_detectioniraqi
 11
 
 MONITOR
-1094
-739
-1250
-784
+1213
+521
+1369
+566
  Distance Between Forces
 targetrange
 4
@@ -1155,18 +1052,18 @@ targetrange
 11
 
 SLIDER
-9
-612
-264
-645
+214
+335
+426
+368
 US_Training
 US_Training
 0
 1
-0.75
+0
 .01
 1
- Above Standard
+% Above Standard
 HORIZONTAL
 
 @#$#@#$#@
