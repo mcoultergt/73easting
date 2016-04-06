@@ -887,7 +887,7 @@ extra_lead_t72_y_cor
 extra_lead_t72_y_cor
 min-pycor
 max-pycor
--8
+7
 1
 1
 NIL
@@ -902,7 +902,7 @@ coil_middle_t72_x_cor
 coil_middle_t72_x_cor
 min-pxcor
 max-pxcor
-20
+24
 1
 1
 NIL
@@ -917,7 +917,7 @@ coil_middle_t72_y_cor
 coil_middle_t72_y_cor
 min-pycor
 max-pycor
-10
+21
 1
 1
 NIL
