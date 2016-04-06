@@ -1532,6 +1532,7 @@ repeat 75 [ go step-aggregate ]
     <go>go</go>
     <metric>count m1a1s</metric>
     <metric>count t72s</metric>
+    <metric>t72thermal</metric>
     <enumeratedValueSet variable="m1a1-spacing">
       <value value="10"/>
     </enumeratedValueSet>
@@ -1541,11 +1542,11 @@ repeat 75 [ go step-aggregate ]
     <enumeratedValueSet variable="m1a1-formation">
       <value value="&quot;Line&quot;"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="m1a1-main-gun" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="m1a1-main-gun" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="lead_m1a1_y_cor">
       <value value="0"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="M1A1Turret_stab" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="M1A1Turret_stab" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="coil-t72s">
       <value value="false"/>
     </enumeratedValueSet>
@@ -1564,25 +1565,25 @@ repeat 75 [ go step-aggregate ]
     <enumeratedValueSet variable="t72-spacing">
       <value value="10"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="m1a1gps" first="0" step="0.25" last="1"/>
-    <steppedValueSet variable="M1A1_fcs" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="m1a1gps" first="0" step="0.5" last="1"/>
+    <steppedValueSet variable="M1A1_fcs" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="number_of_iterations">
       <value value="763"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="m1a1-upgraded-armor" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="m1a1-upgraded-armor" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="desert-visibility">
-      <value value="0"/>
+      <value value="25"/>
       <value value="400"/>
       <value value="800"/>
       <value value="1500"/>
       <value value="3000"/>
       <value value="4000"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="extra-t72s">
       <value value="false"/>
     </enumeratedValueSet>
-    <steppedValueSet variable="US_Training" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="US_Training" first="0" step="0.5" last="1"/>
     <enumeratedValueSet variable="extra_lead_t72_y_cor">
       <value value="-8"/>
     </enumeratedValueSet>
