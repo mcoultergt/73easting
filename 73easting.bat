@@ -1,0 +1,1 @@
+java -d64 -Xmx25000m -Dfile.encoding=UTF-8 -cp NetLogo.jar org.nlogo.headless.Main --model 73eastingsim.nlogo --experiment experiment --table out.csv --spreadsheet out-spreadsheet.csv

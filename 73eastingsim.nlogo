@@ -9,7 +9,7 @@
 ;; ==================END NOTES==================
 
 extensions [profiler]
-globals [sand M1A1turret_stab driftdegree M1A1thermal_sights M1A1thermal_sights_range M1A1gps T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill m1a1-main-gun]  ;; Assume sand is flat after a point...
+globals [sand driftdegree M1A1thermal_sights M1A1thermal_sights_range t72thermal T72turret_stab T72thermal_sights T72gps m1a1hitrate t72hitrate t72max_engagement_range T72thermal_sights_range scale_factor_x scale_factor_y t72_shot m1a1_shot targetrange target_direction m1a1hitadjust t72hitadjust m1a1_move_speed m1a1_shot_speed desert ridgeline_x_meter t72target m1a1target p_k_105 m1a1_armor p_k_t72 p_detection t72targets p_detectioniraqi m1a1p_kill ridgeline_x_cor Desert_Length_In_Meters Desert_Height_In_Meters]  ;; Assume sand is flat after a point...
 breed [m1a1s m1a1] ;; US Army M1A1
 breed [t72s t72] ;; Iraqi Republican Guard T-72
 
@@ -18,7 +18,9 @@ t72s-own [hp fired time_since_shot shot_at]    ;; both t72s and m1a1s have hit p
 
 to setup
   clear-all
-  file-open "results.txt"
+  ;file-close
+  ;file-delete "results.txt"
+  ;file-open "results.txt"
   ask patches [ set pcolor brown ] ;;goahead and set the initial desert color to sand...
   setup-m1a1s   ;; create the m1a1s, then initialize their variables
   setup-t72s ;; create the t72s, then initialize their variables
@@ -34,30 +36,19 @@ to reset
   set initial-number-t72 8
   set lead_m1a1_y_cor 0
   set lead_m1a1_x_cor -20
-  ;set m1a1-main-gun "1"
+  ;set m1a1-main-gun 1
   set lead_t72_x_cor 20
   set lead_t72_y_cor 0
   set extra-t72s true
   set extra_lead_t72_y_cor -8
   set extra_lead_t72_x_cor 22
   set coil-t72s true
-  set coil_middle_t72_x_cor 35
-  set coil_middle_t72_y_cor 10
-  set M1A1_Thermal_Sights true
-  ;set M1A1_Thermal_Sights_Range 2000
-  set M1A1_Turret_Stablization true
-  set M1A1_GPS 1
+  set coil_middle_t72_x_cor coil_middle_t72_x_cor
+  set coil_middle_t72_y_cor coil_middle_t72_y_cor
   set m1a1-formation "Line"
   set m1a1-spacing 10
-  set T72_Thermal_Sights false
-  ;set T72_Thermal_Sights_Range 1300
-  ;set T72_Turret_Stablization false
-  ;set T72_GPS false
   set t72-formation "Line"
   set t72-spacing 10
-  set Desert_Length_In_Meters 10000
-  set Desert_Height_In_Meters 10000
-  set ridgeline_x_cor 0
   set desert-visibility 50
   end
 
@@ -107,11 +98,6 @@ to setup-m1a1s
     set current-m1a1s current-m1a1s - 1
   ]
   set t72targets 0
-  ;;if we have an even number of M1A1s we need to make the line accordingly.
-  ;let initial-number-m1a1-mod initial-number-m1a1 - 1
-  ;if initial-number-m1a1 mod 2 = 0 [ask m1a1 initial-number-m1a1-mod [die] ] ;; mod 2
-  ;;create the LEAD m1a1
-  ;create-m1a1s 1 [set color sky set size 5 setxy lead_m1a1_x_cor lead_m1a1_y_cor set heading 90 set hp 1]
 end
 
 to setup-t72s
@@ -169,73 +155,61 @@ to setup-t72s
   create-ordered-t72s 17 ;; we're going to make our circle of T72s using the same parameters as the other T72s
       [
       setxy coil_middle_t72_x_cor coil_middle_t72_y_cor
-      ifelse max-pxcor - coil_middle_t72_x_cor < 10
-      [fd max-pxcor - coil_middle_t72_x_cor ][fd 10]
+      ifelse max-pxcor - coil_middle_t72_x_cor < 3
+      [fd max-pxcor - coil_middle_t72_x_cor ][ fd 3 ]
       set color red
       set size 5
       set hp 1
       ]
-      ;layout-circle t72s 10 ;setxy coil_middle_t72_x_cor coil_middle_t72_y_cor set hp 1 ;;hardcode 17 for right now, we can bring this out later if we need.
   ]
 end
 
 to setup-technology
-;;<<<<<<< HEAD
-  ;;take the booleans and convert into 0 or 1...
-		ifelse M1A1_Turret_Stablization = True
-       [set M1A1turret_stab 1]
-       [set M1A1turret_stab 0]
-      ifelse M1A1_Thermal_Sights = True
-       [set M1A1thermal_sights 1]; set M1A1thermal_sights_range M1A1_Thermal_Sights_Range] ;;1420 was the engagement ranged afforded to McMaster's M1A1 due to thermal sights from his front line account
-       [set M1A1thermal_sights 0]; set M1A1thermal_sights_range desert-visibility] ;;assume an engagement range of 50m if we don't have thermal sights
-      ifelse M1A1_GPS = True
-       [set M1A1gps 1]
-       [set M1A1gps 0]
-      ;ifelse m1a1-fcs
-      ; [set M1A1_fcs 1]
-      ; [set M1A1_fcs 0]
-
-       ifelse m1a1-upgraded-armor = True
-       [set m1a1_armor 1]
-       [set m1a1_armor 0]
-     ; ifelse T72_Turret_Stablization = True
-     ;  [set T72turret_stab 1]
-     ;  [set T72turret_stab 0]
-      ifelse T72_Thermal_Sights = True
-       [set T72thermal_sights 1 set T72thermal_sights_range 800] ;;assume the Iraqi version to be 1/2 to 1/3 as good.
-       [set T72thermal_sights 0 set T72thermal_sights_range desert-visibility] ;;assume this is all you can see in a sandstorm...is this a good estimate?
-     ; ifelse T72_GPS = True
-     ;  [set T72gps 1]
-     ; [set T72gps 0]
-  ;;second iteration hit rate
-  set m1a1hitadjust (1 + ( 0.00443299 * (1 - M1A1turret_stab ) ) + ( 0.01676 * (1 - M1A1thermal_sights ) ) + ( 0.02311 * (1 - M1A1gps )))
-  set t72hitrate (0.5 + ( 0.00543299 * T72turret_stab ) + (0.00676  * T72thermal_sights ) + (0.01311 * T72gps )) / 2
-  ;;in here we'll setup up our technology variables
-  ;; note for all this the point of the model isn't to see if the technology should be IMPROVED at all, it's to see if a
-  ;; tangible difference exists for having the technology in the first place.
 end
 
 to setup-move
   ;; from open source documentation, the top speed (off road) of a M1A1 is 48km/h.
   ;; and since we know our scale factors, we can get that each M1A1 should move 48e-3 * scale_factor per tick...we'll use scale factor X just to be simple.
   set m1a1_move_speed 48000 / 3600 * scale_factor_x ;; M1A1 speed is 48kmh ==> 48000m/h ==> 48000m/3600s  get our move speed in m/s (will be 13.3m/s)
-  ;show scale_factor_x
 end
+
+;to drift
+;let inbattle0
 
 
 to setup-desert
   ;;in this function we're going to setup and normalize the desert
+  ;;figure out our sides based on our desert area...
+  let Desert_Square_Meters Desert_Square_Kilometers * 1000000
+  set Desert_Length_In_Meters ( sqrt (Desert_Square_Meters))
+  ;show Desert_Length_In_Meters
+  set Desert_Height_In_Meters ( sqrt (Desert_Square_Meters) )
   set scale_factor_x max-pxcor / Desert_Length_In_Meters  ;; this will give us a fraction so we can work with xycor easier
   set scale_factor_y max-pycor / Desert_Height_In_Meters  ;;this will give us a fraction so we can work with xycor easier
+  set ridgeline_x_cor ( lead_t72_x_cor ) - ( 1420 * scale_factor_x )
   let desert-setup min-pycor ;; dynamically allocate our min-pycor...
   let random_num 0 ;;initialize
   while [(desert-setup + random_num) <= max-pycor] ;;while our index (desert-setup) plus our random numeber (random_num) are within the bounds of the map...
   [
-  ask patch ( (ridgeline_x_cor - 2) + random 3) (desert-setup + random_num) [set pcolor ( 36 + random-float 3) ];(max-pycor - desert-setup) [set pcolor 37] ;; set the random patch to be a random color based around the 'sand' color
+  ask patch ( ( ridgeline_x_cor - 2) + random 3) (desert-setup + random_num) [set pcolor ( 36 + random-float 3) ];(max-pycor - desert-setup) [set pcolor 37] ;; set the random patch to be a random color based around the 'sand' color
   set desert-setup desert-setup + 1 ;; increment our index
   set random_num (random 2 + random -2)
   ]
   set ridgeline_x_meter ridgeline_x_cor / scale_factor_x
+  ;show ridgeline_x_cor
+
+  ;;setup our t72 sights... based on weather...
+    ifelse desert-visibility < 800
+    [
+     set t72thermal 1
+     set t72max_engagement_range 800
+    ]
+    [
+     set t72thermal 0
+     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
+    ]
+    set t72max_engagement_range t72max_engagement_range * scale_factor_x
+        ;show t72max_engagement_range
 end
 
 
@@ -258,11 +232,13 @@ to go
   ;;sanity check and make sure somehow our tanks didn't all destroy each other
   if not any? t72s
   [
-    easting_report
+    ;easting_report
+    stop
    ]
   if not any? m1a1s
   [
-    easting_report
+    ;easting_report
+    stop
   ]
   drift
   ask m1a1s
@@ -274,11 +250,12 @@ to go
   ask t72s
   [
     ;;based on historical data the Iraqi Republican Guard tanks didn't move during the battle.
+    t72detect
     t72engage
   ]
   tick
-  ask t72s [if hp <= 0 [ die ]]
-  ask m1a1s [if hp <= 0 [ die ]]
+  ;ask t72s [if hp <= 0 [ die ]]
+  ;ask m1a1s [if hp <= 0 [ die ]]
   clear-links ;; reset links so we can see missed shots (if we're looking...)
 end
 
@@ -293,6 +270,8 @@ to move
     set heading driftdegree
     fd m1a1_move_speed ;; this is how we'll end up drifting our tanks...roughly by a sum of +-4 degrees. this is probably a little extreme and we can change it later if need be.
     set fired fired - 1 ;;go ahead and decrement the 'fired' variable
+    ;show ridgeline_x_cor
+    ;show pxcor
     if pxcor >= ridgeline_x_cor
      [
      set crest 1 ;; set our crest variable if they've gone over the hill
@@ -307,7 +286,7 @@ to detect
   ;;now we are going to create an code block to see if the gunner will see any enemy targets.
   ;show "entering detect"
   ifelse crest != 1
-  [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ) - ridgeline_x_cor )] ;;find any T-72s in visual range, changed to include ridge...)
+  [set t72targets t72s in-radius abs ( ( ( 4000 * scale_factor_x ) - ridgeline_x_cor ) ) ] ;;find any T-72s in visual range, changed to include ridge...)
   [set t72targets t72s in-radius ( ( 4000 * scale_factor_x ))] ;;find any T-72s in visual range AFTER the ridge...)
   let direction_of_view heading - 45 + random-float 90 ;;
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
@@ -342,11 +321,11 @@ to detect
        ;;need to fix this before final commit!
        ;write "tau ="
        ;show tau
-       ifelse M1A1thermal_sights = 1
+       ifelse M1A1_Thermal_sights = 1
        [ set p_detection 0.99
          ;show "set thermal sights"
          ]
-       [ set p_detection (1 / ( 1 + exp (( range / (1154 + ( 11788.68 * M1A1_Thermal_Sights ) )  - ( 1.75 + (8.259 * M1A1_Thermal_Sights))))))]
+       [ set p_detection (1 - (1 / 3 * (1 - US_Training))) * (1 / ( 1 + exp (( range / (1154 + ( 11788.68 * M1A1_Thermal_Sights ) )  - ( 1.75 + (8.259 * M1A1_Thermal_Sights))))))]
        set random_detect random-float 1
        if random_detect <= p_detection
        [
@@ -360,18 +339,8 @@ to detect
   end
 
 to t72detect
-   let t72max_engagement_range 0
-  let localt72thermal 0
-    ifelse desert-visibility < 800
-    [set localt72thermal 1
-     set t72max_engagement_range 800
-    ]
-    [set localt72thermal 0
-     set t72max_engagement_range desert-visibility ;; if the weather is good the T-72s engage using naked eye
-    ]
-  let m1a1targets m1a1s in-radius (t72max_engagement_range * scale_factor_x) ;;find any Abrams Tanks in our max engagement range
+  let m1a1targets m1a1s in-radius (t72max_engagement_range) ;;find any Abrams Tanks in our max engagement range
   let direction_of_view heading - 45 + random-float 90 ;;
-  ;;show direction_of_view
   let tank_x_pos xcor;;asign a variable for x cord of "your" tank
   let tank_y_pos ycor;;assign a variable for y cord of "enemy" tank
   let target_x_pos 0
@@ -387,24 +356,25 @@ to t72detect
    set delta_x target_x_pos - tank_x_pos
    set delta_y target_y_pos - tank_y_pos
    set t72_target_direction atan delta_x delta_y
-     if direction_of_view - 5 < target_direction and direction_of_view + 5 > target_direction
+     if direction_of_view - 5 < t72_target_direction and direction_of_view + 5 > t72_target_direction
      [
        let range (distance myself) / scale_factor_x
-       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * localt72thermal)) - (1.75 + (.5475 * localt72thermal)))))
+       set p_detectioniraqi (1 / ( 1 + exp (( range / (1154 - 886.8 * t72thermal)) - (1.75 + (.5475 * t72thermal)))))
      ]
-  ]
      set random_detect random-float 1
      if random_detect <= p_detectioniraqi
        [
        set m1a1target self
        ]
+    ]
   end
 
 
 to m1a1engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
-  ;;let m1a1max_engagement_range M1A1thermal_sights_range * scale_factor_x ;; set the farthest away patch the M1A1s can engage...assume our thermal sights are our max range.
+  ;;check to make sure our tanks can shoot...
+  if hp <= 0 [die stop ]
   let m1pkrand 0
   if t72target != 0
   [
@@ -418,8 +388,8 @@ to m1a1engage
         create-link-to t72target [set color blue] ;;show what units the M1A1s are engaging
         set label "Fire!" ;; label the M1A1 that fired as such
         ;ask t72target [set shot_at TRUE] ;;the target has been engaged so the T-72s can shoot back... if they're in range...
-        set targetrange [distance myself] of t72target / scale_factor_x
-        if targetrange < 3500
+        set targetrange [distance myself] of t72target / scale_factor_x ;; this put it into meters...
+        if targetrange < ( 3500 ) ;;since we just put our target range into meters let's check it against our desert visibility...
         [
         set m1a1hitrate (1 / (1 + (exp ((targetrange / (475.2 + (M1A1_fcs * 235.2))) - (3.31 + (0.438 * M1A1_fcs))))))
         set m1a1_shot random-float 1 ;;have a randomly distributed uniform [0,1].
@@ -431,11 +401,12 @@ to m1a1engage
               set m1pkrand random-float 1
               if m1pkrand < m1a1p_kill
                [
-                 ask t72target [set hp hp - m1a1p_kill set label "Killed!"] ;; And destoy the target tank if we're <= that probability for heat round
+                 ask t72target [set hp hp - 1] ;; And destoy the target tank if we're <= that probability for heat round
                ]
 
           ]
-          [set label "Miss!"] ;;else label the M1A1 that fired as having missed.
+          []
+          ;[set label "Miss!"] ;;else label the M1A1 that fired as having missed.
            set fired 3 ;; reset at the end of 3 move turns (set in the 'move' function) we're going to let our turtle fire again. this should 'slow down' the simulation.
            if M1A1turret_stab < 1
             [set shoot_stop 2 ;;;fire on the move
@@ -453,43 +424,38 @@ end
 to t72engage
   ;; now we're going to check to see if our enemy T-72s are within our range (defined by M1A1thermal_sights_range) and if they are, use our m1a1hitrate probability to attempt to him them.
   ;; convert our patches into distance...
+  if hp <= 0 [die stop ]
   set fired fired - 1 ;;we're adding this line in here because the T72s dont' have a move function...
-  let t72max_engagement_range t72thermal_sights_range / scale_factor_x ;; set the farthest away patch the M1A1s can engage
-  let m1a1targets m1a1s in-radius t72max_engagement_range ;;find any T-72s in our max engagement range
-  if m1a1targets != nobody
+  if m1a1target != 0
   [
-    let target min-one-of m1a1targets [distance myself] ;; engage the closest M1A1
-      if target != nobody
+    if m1a1target != nobody
       [
-    let targetrangem1a1 [distance myself] of target / scale_factor_x
-
-    ;if target xcor >= ridgeline_x_cor
-    let shoot false ;;reset the check
-    if target != nobody [ set shoot true ] ;;if there's somebody in range
-    ;;let targetrange distance target * scale_factor_x
-    if (shoot = true)
-    [
-      if [crest] of target = 1 ;; if the target is over the ridge
+      let targetrangem1a1 [distance myself] of m1a1target / scale_factor_x ;;put this value into meters
+      if targetrangem1a1 < 2500 ;;this is kind of the max value the t72 can shoot at...
+      [
+      let shoot false ;;reset the check
+      if m1a1target != nobody [ set shoot true ] ;;if there's somebody in range
+      if (shoot = true)
+      [
+      if [crest] of m1a1target = 1 ;; if the target is over the ridge
       [
         if fired <= 0 ;; add in our time dependence for our T-72s, just based roughly on the M1A1 speed...might be a good idea to change this later.
         [
-          create-link-to target [set color red] ;;create a red link to M1A1s
+          create-link-to m1a1target [set color red] ;;create a red link to M1A1s
           set t72hitrate (1 / ( 1 + exp ( (targetrangem1a1 / 643.5) - 2.97)))
           set t72_shot random-float 1 ;;have a randomly distributed uniform [0,1].
           if t72_shot <= t72hitrate ;;check this random number against our hit probability...
           [
             ;; since we've hit let's see if armor is on
-            ifelse m1a1_armor = 0
-            [set p_k_t72 (0.99 - 0.00018 * targetrangem1a1)]
-            [set p_k_t72 (0.89 - 0.00028 * targetrangem1a1)]
+            set p_k_t72 1 / (1 + exp( (targetrangem1a1 / (1050 -(554.53 * m1a1-upgraded-armor))) - (2.5237 - (.5280 * m1a1-upgraded-armor))))
             let t72_shot_kill random-float 1 ;;have a randomly distributed uniform [0,1].
             if t72_shot_kill <= p_k_t72
             [
-            ask target [set hp hp - 1]
+            ask m1a1target [set hp hp - 1]
             ]
           ]
       set fired 3 ;;reset our fired for t72s.
-
+     ]
     ]
     ]
   ]
@@ -497,22 +463,23 @@ to t72engage
   ]
 end
 
-to easting_report
-  ask m1a1s
-  [file-print hp]
-  file-print "Hello World"
-  file-close;"results.txt"
-  ;export-plot "Number Of Tanks" "plot.csv"
-  set number_of_iterations number_of_iterations - 1
-  ifelse number_of_iterations > 0
-  [
-  setup
-  go
-  ]
-  [
-    stop
-  ]
-end
+
+;to easting_report
+;  ask m1a1s
+;  [file-print hp]
+;  file-print "Hello World"
+;  file-close;"results.txt"
+;  export-plot "Number Of Tanks" "plot.csv"
+;  set number_of_iterations number_of_iterations - 1
+;  ifelse number_of_iterations > 0
+;  [
+;  setup
+;  go
+;  ]
+;  [
+;    stop
+;  ]
+;end
 
 ;to death  ;; turtle procedure
 ;  ;;when energy dips below zero, die
@@ -549,12 +516,12 @@ end
 ;;end
 @#$#@#$#@
 GRAPHICS-WINDOW
-601
-10
-1421
-651
-40
-30
+481
+27
+1201
+768
+35
+35
 10.0
 1
 14
@@ -565,10 +532,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--40
-40
--30
-30
+-35
+35
+-35
+35
 0
 0
 1
@@ -643,32 +610,32 @@ initial-number-t72
 initial-number-t72
 0
 200
-8
+13
 1
 1
 t72
 HORIZONTAL
 
 SLIDER
-7
-181
-179
-214
+1037
+871
+1209
+904
 lead_m1a1_x_cor
 lead_m1a1_x_cor
 min-pxcor
 max-pxcor
--20
+-18
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-222
-179
-255
+394
+833
+566
+866
 lead_m1a1_y_cor
 lead_m1a1_y_cor
 min-pycor
@@ -680,67 +647,34 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-260
-179
-293
-lead_t72_x_cor
-lead_t72_x_cor
-min-pxcor
-max-pxcor
-20
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-4
-303
-176
-336
-lead_t72_y_cor
-lead_t72_y_cor
-min-pycor
-max-pycor
-0
-1
-1
-NIL
-HORIZONTAL
-
-SWITCH
-19
 576
-197
-609
-M1A1_Thermal_Sights
-M1A1_Thermal_Sights
-0
+831
+748
+864
+lead_t72_x_cor
+lead_t72_x_cor
+min-pxcor
+max-pxcor
+4
 1
--1000
+1
+NIL
+HORIZONTAL
 
-SWITCH
-19
-654
-224
-687
-M1A1_Turret_Stablization
-M1A1_Turret_Stablization
+SLIDER
+756
+828
+928
+861
+lead_t72_y_cor
+lead_t72_y_cor
+min-pycor
+max-pycor
 0
 1
--1000
-
-SWITCH
-18
-691
-134
-724
-M1A1_GPS
-M1A1_GPS
-0
 1
--1000
+NIL
+HORIZONTAL
 
 TEXTBOX
 278
@@ -753,150 +687,35 @@ Computed Values from Simulation
 1
 
 SLIDER
-16
-1011
-273
-1044
-Desert_Length_In_Meters
-Desert_Length_In_Meters
-100
-100000
-1751
-1
-1
-meters
-HORIZONTAL
-
-SLIDER
-16
-1046
-271
-1079
-Desert_Height_In_Meters
-Desert_Height_In_Meters
-100
-100000
-1765
-1
-1
-meters
-HORIZONTAL
-
-TEXTBOX
-20
-992
-170
-1010
-Desert Setup
-11
-0.0
-1
-
-TEXTBOX
-20
-773
-170
-791
-T-72 Setup
-11
-0.0
-1
-
-TEXTBOX
-21
-561
-171
-579
-M1A1 Setup
-11
-0.0
-1
-
-MONITOR
-277
-490
-434
-535
-Minimum Y Value in Meters
-min-pycor / scale_factor_y
-17
-1
-11
-
-MONITOR
-277
-540
-439
-585
-Maximum Y Value in Meters
-max-pycor / scale_factor_y
-17
-1
-11
-
-MONITOR
-277
-590
-434
-635
-Minimum X Value in Meters
-min-pxcor / scale_factor_x
-17
-1
-11
-
-MONITOR
-278
-639
-440
-684
-Maximum x Value in Meters
-max-pxcor / scale_factor_x
-17
-1
-11
-
-SLIDER
-16
-1084
-188
-1117
-ridgeline_x_cor
-ridgeline_x_cor
-min-pxcor
-max-pxcor
+393
+872
+680
+905
+Desert_Square_Kilometers
+Desert_Square_Kilometers
 0
+200
+25
 1
 1
-NIL
+km^2
 HORIZONTAL
-
-MONITOR
-279
-688
-515
-733
-Ridgeline Position (in Meters from Origin)
-ridgeline_x_meter
-17
-1
-11
 
 CHOOSER
-123
-906
-261
-951
+12
+218
+143
+263
 t72-formation
 t72-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
-16
-955
-188
-988
+685
+872
+857
+905
 t72-spacing
 t72-spacing
 0
@@ -908,122 +727,122 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-735
-189
-768
+863
+872
+1035
+905
 m1a1-spacing
 m1a1-spacing
 0
 100
-38
+10
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-137
-689
-275
-734
+214
+372
+352
+417
 m1a1-formation
 m1a1-formation
 "Line" "Vee" "Wedge" "Echelon Left" "Echelon Right"
 0
 
 SLIDER
-15
-1122
-203
-1155
+11
+180
+199
+213
 desert-visibility
 desert-visibility
 0
-20000
-50
+4000
+400
 1
 1
 meters
 HORIZONTAL
 
 SWITCH
-7
-341
-121
-374
+934
+826
+1048
+859
 extra-t72s
 extra-t72s
-1
+0
 1
 -1000
 
 SWITCH
-7
-450
-110
-483
+1213
+799
+1316
+832
 coil-t72s
 coil-t72s
-1
+0
 1
 -1000
 
 SLIDER
-7
-380
-179
-413
+219
+872
+391
+905
 extra_lead_t72_x_cor
 extra_lead_t72_x_cor
 min-pxcor
 max-pxcor
-22
+18
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-415
-180
-448
+1214
+764
+1386
+797
 extra_lead_t72_y_cor
 extra_lead_t72_y_cor
 min-pycor
 max-pycor
--8
+-5
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-484
-179
-517
+1213
+833
+1385
+866
 coil_middle_t72_x_cor
 coil_middle_t72_x_cor
 min-pxcor
 max-pxcor
-35
+24
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-522
-180
-555
+1214
+871
+1386
+904
 coil_middle_t72_y_cor
 coil_middle_t72_y_cor
 min-pycor
 max-pycor
-10
+13
 1
 1
 NIL
@@ -1046,81 +865,206 @@ NIL
 NIL
 1
 
-SWITCH
-17
-792
-184
-825
-T72_Thermal_Sights
-T72_Thermal_Sights
-0
-1
--1000
-
-SWITCH
-194
-736
-300
-769
-m1a1-fcs
-m1a1-fcs
-0
-1
--1000
-
-SWITCH
-16
-614
-196
-647
-m1a1-upgraded-armor
-m1a1-upgraded-armor
-0
-1
--1000
-
 SLIDER
-365
-772
-537
-805
+214
+226
+386
+259
 M1A1_fcs
 M1A1_fcs
 0
 1
-1
+0
 0.0001
 1
 NIL
 HORIZONTAL
 
-INPUTBOX
-529
-421
-684
-481
-number_of_iterations
-833
+SLIDER
+215
+101
+387
+134
+M1A1_Thermal_Sights
+M1A1_Thermal_Sights
+0
 1
 0
-Number
+0.000001
+1
+NIL
+HORIZONTAL
 
-BUTTON
-351
-275
-422
-308
-Profiler
-setup                  ;; set up the model\nprofiler:start         ;; start profiling\nrepeat 500 [ go ]       ;; run something you want to measure\nprofiler:stop          ;; stop profiling\nprint profiler:report  ;; view the results\nprofiler:reset         ;; clear the data
-NIL
+SLIDER
+215
+186
+389
+219
+m1a1-upgraded-armor
+m1a1-upgraded-armor
+0
 1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
+0
+.000001
 1
+NIL
+HORIZONTAL
+
+SLIDER
+215
+266
+387
+299
+m1a1gps
+m1a1gps
+0
+1
+0
+0.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+215
+143
+387
+176
+m1a1-main-gun
+m1a1-main-gun
+0
+1
+0
+0.000001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+215
+300
+387
+333
+M1A1Turret_stab
+M1A1Turret_stab
+0
+1
+0
+0.000001
+1
+NIL
+HORIZONTAL
+
+PLOT
+272
+461
+472
+611
+# Of Tanks
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -2674135 true "" "plot count t72s"
+"pen-1" 1.0 0 -13345367 true "" "plot count m1a1s"
+
+MONITOR
+1215
+261
+1305
+306
+US Tank P_Hit
+m1a1hitrate
+4
+1
+11
+
+MONITOR
+1215
+372
+1316
+417
+Iraqi Tank P_Hit
+t72hitrate
+4
+1
+11
+
+MONITOR
+1215
+309
+1331
+354
+US Tank P_Kill | Hit
+m1a1p_kill
+4
+1
+11
+
+MONITOR
+1214
+421
+1340
+466
+Iraqi Tank P_Kill | Hit
+p_k_t72
+4
+1
+11
+
+MONITOR
+1214
+213
+1348
+258
+US Tanks P_Detection
+p_detection
+4
+1
+11
+
+MONITOR
+1213
+471
+1352
+516
+Iraqi Tank P_Detection
+p_detectioniraqi
+4
+1
+11
+
+MONITOR
+1213
+521
+1369
+566
+ Distance Between Forces
+targetrange
+4
+1
+11
+
+SLIDER
+214
+335
+426
+368
+US_Training
+US_Training
+0
+1
+0
+.01
+1
+% Above Standard
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1479,6 +1423,83 @@ repeat 75 [ go step-aggregate ]
     org.nlogo.sdm.gui.AggregateDrawing 1
         org.nlogo.sdm.gui.ReservoirFigure "attributes" "attributes" 1 "FillColor" "Color" 192 192 192 15 105 30 30
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="20" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count m1a1s</metric>
+    <metric>count t72s</metric>
+    <enumeratedValueSet variable="m1a1-spacing">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_t72_y_cor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="m1a1-formation">
+      <value value="&quot;Line&quot;"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1-main-gun" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="lead_m1a1_y_cor">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="M1A1Turret_stab" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="coil-t72s">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_t72_x_cor">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Desert_Square_Kilometers">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="t72-formation">
+      <value value="&quot;Line&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lead_m1a1_x_cor">
+      <value value="-20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="t72-spacing">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1gps" first="0" step="0.25" last="1"/>
+    <steppedValueSet variable="M1A1_fcs" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="number_of_iterations">
+      <value value="763"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="m1a1-upgraded-armor" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="desert-visibility">
+      <value value="0"/>
+      <value value="400"/>
+      <value value="800"/>
+      <value value="1500"/>
+      <value value="3000"/>
+      <value value="4000"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="M1A1_Thermal_Sights" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="extra-t72s">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="US_Training" first="0" step="0.25" last="1"/>
+    <enumeratedValueSet variable="extra_lead_t72_y_cor">
+      <value value="-8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coil_middle_t72_x_cor">
+      <value value="35"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coil_middle_t72_y_cor">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-m1a1">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extra_lead_t72_x_cor">
+      <value value="22"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number-t72">
+      <value value="13"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
